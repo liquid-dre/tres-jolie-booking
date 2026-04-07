@@ -59,8 +59,9 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero */}
-        <section className="px-4 py-24 sm:py-32 lg:py-40">
-          <div className="mx-auto max-w-6xl text-center">
+        <section className="relative px-4 pb-10 pt-20 sm:pt-28 lg:pt-32">
+          {/* Heading — overlaps the image */}
+          <div className="relative z-10 mx-auto max-w-6xl text-center">
             <Ornament />
             <h1 className="mt-8 font-serif text-5xl font-normal italic leading-tight sm:text-6xl lg:text-8xl">
               <span className="not-italic">Welcome</span> to
@@ -71,22 +72,27 @@ export default function Home() {
             </h1>
           </div>
 
-          {/* Hero image + flanking text */}
-          <div className="mx-auto mt-16 flex max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-end lg:justify-center lg:gap-16">
-            <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground lg:text-right">
-              Nestled in Ruimsig, Johannesburg
-              — a Mediterranean country restaurant
-              celebrating cuisine and nature.
-            </p>
-
-            {/* Arch image */}
-            <div className="h-[380px] w-[280px] overflow-hidden rounded-t-full sm:h-[450px] sm:w-[340px] md:h-[500px] md:w-[380px]">
+          {/* Arch image — pulled up so heading overlaps it */}
+          <div className="relative z-0 mx-auto -mt-6 flex max-w-6xl flex-col items-center sm:-mt-10 lg:-mt-16">
+            <div className="h-[420px] w-[320px] overflow-hidden rounded-t-full sm:h-[500px] sm:w-[400px] md:h-[580px] md:w-[460px]">
               <img
                 src="/hero.jpg"
                 alt="Tres Jolie restaurant interior"
                 className="h-full w-full object-cover"
               />
             </div>
+          </div>
+
+          {/* Flanking text — positioned beside the image */}
+          <div className="mx-auto mt-8 flex max-w-6xl flex-col items-center gap-8 lg:-mt-48 lg:flex-row lg:items-end lg:justify-between">
+            <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground lg:text-right">
+              Nestled in Ruimsig, Johannesburg
+              — a Mediterranean country restaurant
+              celebrating cuisine and nature.
+            </p>
+
+            {/* Spacer for the arch image in the center */}
+            <div className="hidden w-[460px] shrink-0 lg:block" />
 
             <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground lg:text-left">
               Wood-fired pizzas, Cape Malay curries,
