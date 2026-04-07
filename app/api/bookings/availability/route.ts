@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getDayOfWeek, getMealPeriod } from "@/lib/booking-utils";
-import { BookingStatus } from "@/lib/prisma";
+import { BookingStatus } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
