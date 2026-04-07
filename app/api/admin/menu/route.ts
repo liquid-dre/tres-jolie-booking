@@ -3,16 +3,20 @@ import { prisma } from "@/lib/db";
 
 // GET all categories with items
 export async function GET() {
-  const categories = await prisma.menuCategory.findMany({
-    orderBy: { sortOrder: "asc" },
-    include: {
-      items: {
-        orderBy: { sortOrder: "asc" },
+  try {
+    const categories = await prisma.menuCategory.findMany({
+      orderBy: { sortOrder: "asc" },
+      include: {
+        items: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
-    },
-  });
-
-  return NextResponse.json({ categories });
+    });
+    return NextResponse.json({ categories });
+  } catch {
+    // Table may not exist yet if migration hasn't been run
+    return NextResponse.json({ categories: [] });
+  }
 }
 
 // POST create a new category or item

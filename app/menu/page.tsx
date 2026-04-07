@@ -11,17 +11,42 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function MenuPage() {
-  const categories = await prisma.menuCategory.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: "asc" },
-    include: {
-      items: {
-        where: { isActive: true },
-        orderBy: { sortOrder: "asc" },
+type CategoryWithItems = {
+  id: string;
+  name: string;
+  label: string;
+  sortOrder: number;
+  isActive: boolean;
+  items: {
+    id: string;
+    name: string;
+    description: string | null;
+    price: string;
+    sortOrder: number;
+    isActive: boolean;
+  }[];
+};
+
+async function getMenuCategories(): Promise<CategoryWithItems[]> {
+  try {
+    return await prisma.menuCategory.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+      include: {
+        items: {
+          where: { isActive: true },
+          orderBy: { sortOrder: "asc" },
+        },
       },
-    },
-  });
+    });
+  } catch {
+    // Table may not exist yet if migration hasn't been run
+    return [];
+  }
+}
+
+export default async function MenuPage() {
+  const categories = await getMenuCategories();
 
   return (
     <>
