@@ -61,8 +61,14 @@ export default function Home() {
               celebrating cuisine and nature.
             </p>
 
-            {/* Arch placeholder */}
-            <div className="h-[380px] w-[280px] overflow-hidden rounded-t-full bg-gradient-to-b from-stone-300 via-stone-400 to-stone-500 sm:h-[450px] sm:w-[340px] md:h-[500px] md:w-[380px]" />
+            {/* Arch image */}
+            <div className="h-[380px] w-[280px] overflow-hidden rounded-t-full sm:h-[450px] sm:w-[340px] md:h-[500px] md:w-[380px]">
+              <img
+                src="/hero.jpg"
+                alt="Tres Jolie restaurant interior"
+                className="h-full w-full object-cover"
+              />
+            </div>
 
             <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground lg:text-left">
               Wood-fired pizzas, Cape Malay curries,
@@ -102,9 +108,15 @@ export default function Home() {
             {/* Vertical divider */}
             <div className="hidden w-px self-stretch bg-border md:block" />
 
-            {/* Arch placeholder */}
+            {/* Arch image */}
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full bg-gradient-to-br from-stone-300 via-amber-200/40 to-stone-400 sm:h-[480px] sm:w-[360px]" />
+              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
+                <img
+                  src="/about.jpg"
+                  alt="Fine dining at Tres Jolie"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -118,9 +130,15 @@ export default function Home() {
           className="scroll-mt-20 px-4 py-24 sm:py-32"
         >
           <div className="mx-auto flex max-w-6xl flex-col-reverse gap-10 md:flex-row md:items-center">
-            {/* Dark panel with arch placeholder */}
+            {/* Dark panel with arch image */}
             <div className="flex flex-1 items-center justify-center rounded-none bg-foreground/95 py-16 md:py-20">
-              <div className="h-[380px] w-[260px] overflow-hidden rounded-t-full bg-gradient-to-b from-amber-100/80 via-stone-300 to-stone-500 sm:h-[440px] sm:w-[300px]" />
+              <div className="h-[380px] w-[260px] overflow-hidden rounded-t-full sm:h-[440px] sm:w-[300px]">
+                <img
+                  src="/menu.jpg"
+                  alt="Cuisine at Tres Jolie"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             </div>
 
             {/* Vertical divider */}
@@ -173,9 +191,15 @@ export default function Home() {
             {/* Vertical divider */}
             <div className="hidden w-px self-stretch bg-border md:block" />
 
-            {/* Arch placeholder */}
+            {/* Arch image */}
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full bg-gradient-to-br from-emerald-200/30 via-stone-300 to-stone-400 sm:h-[480px] sm:w-[360px]" />
+              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
+                <img
+                  src="/experience.jpg"
+                  alt="Garden dining at Tres Jolie"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </section>
