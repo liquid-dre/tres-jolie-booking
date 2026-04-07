@@ -59,7 +59,7 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative px-4 pb-10 pt-20 sm:pt-28 lg:pt-32">
+        <section className="relative px-4 pb-10 pt-10 sm:pt-14 lg:pt-16">
           {/* Heading — overlaps the image */}
           <div className="relative z-10 mx-auto max-w-6xl text-center">
             <Ornament />
@@ -108,7 +108,7 @@ export default function Home() {
         {/* About — text left, image right */}
         <section
           id="about"
-          className="scroll-mt-20 px-4 py-24 sm:py-32"
+          className="scroll-mt-28 px-4 py-24 sm:py-32"
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-center">
             {/* Text */}
@@ -151,7 +151,7 @@ export default function Home() {
         {/* Menu — image left, text right (alternating) */}
         <section
           id="menu"
-          className="scroll-mt-20 px-4 py-24 sm:py-32"
+          className="scroll-mt-28 px-4 py-24 sm:py-32"
         >
           <div className="mx-auto flex max-w-6xl flex-col-reverse gap-10 md:flex-row md:items-center">
             {/* Dark panel with arch image */}
@@ -191,7 +191,7 @@ export default function Home() {
         <div className="border-t border-border" />
 
         {/* Experience — text left, image right */}
-        <section className="scroll-mt-20 px-4 py-24 sm:py-32">
+        <section className="scroll-mt-28 px-4 py-24 sm:py-32">
           <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-center">
             {/* Text */}
             <div className="flex-1 md:pr-12">
@@ -234,7 +234,7 @@ export default function Home() {
         {/* Hours & Contact — map left, text right */}
         <section
           id="contact"
-          className="scroll-mt-20 px-4 py-24 sm:py-32"
+          className="scroll-mt-28 px-4 py-24 sm:py-32"
         >
           <div className="mx-auto flex max-w-6xl flex-col-reverse gap-10 md:flex-row md:items-center">
             {/* Map with arch treatment */}
