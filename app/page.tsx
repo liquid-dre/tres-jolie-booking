@@ -35,9 +35,27 @@ function Ornament() {
   );
 }
 
+function GridLines() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-40 mx-auto hidden max-w-7xl px-4 sm:px-6 lg:flex"
+    >
+      <div className="flex w-full justify-between">
+        <div className="w-px bg-foreground/[0.06]" />
+        <div className="w-px bg-foreground/[0.06]" />
+        <div className="w-px bg-foreground/[0.06]" />
+        <div className="w-px bg-foreground/[0.06]" />
+        <div className="w-px bg-foreground/[0.06]" />
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
     <>
+      <GridLines />
       <Header />
       <main className="flex-1">
         {/* Hero */}
