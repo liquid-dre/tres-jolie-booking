@@ -59,11 +59,11 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative px-4 pb-10 pt-10 sm:pt-14 lg:pt-16">
+        <section className="relative px-4 pb-6 pt-4 sm:pt-6 lg:pt-8">
           {/* Heading — overlaps the image */}
           <div className="relative z-10 mx-auto max-w-6xl text-center">
             <Ornament />
-            <h1 className="mt-8 font-serif text-5xl font-normal italic leading-tight sm:text-6xl lg:text-8xl">
+            <h1 className="mt-4 font-serif text-5xl font-normal italic leading-tight sm:text-6xl lg:text-8xl">
               <span className="not-italic">Welcome</span> to
               <br />
               <span className="inline-block border-b-2 border-foreground/30 pb-2">
@@ -74,7 +74,7 @@ export default function Home() {
 
           {/* Arch image — pulled up so heading overlaps it */}
           <div className="relative z-0 mx-auto -mt-6 flex max-w-6xl flex-col items-center sm:-mt-10 lg:-mt-16">
-            <div className="h-[420px] w-[320px] overflow-hidden rounded-t-full sm:h-[500px] sm:w-[400px] md:h-[580px] md:w-[460px]">
+            <div className="h-[320px] w-[260px] overflow-hidden rounded-t-full sm:h-[380px] sm:w-[320px] md:h-[420px] md:w-[360px]">
               <img
                 src="/hero.jpg"
                 alt="Tres Jolie restaurant interior"
@@ -84,7 +84,7 @@ export default function Home() {
           </div>
 
           {/* Flanking text — positioned beside the image */}
-          <div className="mx-auto mt-8 flex max-w-6xl flex-col items-center gap-8 lg:-mt-48 lg:flex-row lg:items-end lg:justify-between">
+          <div className="mx-auto mt-6 flex max-w-6xl flex-col items-center gap-6 lg:-mt-36 lg:flex-row lg:items-end lg:justify-between">
             <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground lg:text-right">
               Nestled in Ruimsig, Johannesburg
               — a Mediterranean country restaurant
@@ -92,7 +92,7 @@ export default function Home() {
             </p>
 
             {/* Spacer for the arch image in the center */}
-            <div className="hidden w-[460px] shrink-0 lg:block" />
+            <div className="hidden w-[360px] shrink-0 lg:block" />
 
             <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground lg:text-left">
               Wood-fired pizzas, Cape Malay curries,
