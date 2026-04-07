@@ -1,56 +1,7 @@
 import Link from "next/link";
 import { Header } from "@/components/shared/header";
 import { Footer } from "@/components/shared/footer";
-
-function DiscoverLink({ href = "#" }: { href?: string }) {
-  return (
-    <Link
-      href={href}
-      className="mt-8 inline-flex items-center gap-3 border-b border-foreground pb-1 text-[11px] font-normal uppercase tracking-[0.2em] text-foreground transition-colors hover:text-foreground/70"
-    >
-      Discover
-      <span className="text-base">&#8594;</span>
-    </Link>
-  );
-}
-
-function Ornament() {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="mx-auto text-foreground/30"
-    >
-      <path
-        d="M12 2C12 2 14 6 14 8C14 10 12 12 12 12C12 12 10 10 10 8C10 6 12 2 12 2Z"
-        fill="currentColor"
-      />
-      <path
-        d="M12 12C12 12 16 14 18 14C20 14 22 12 22 12C22 12 20 16 18 18C16 20 12 22 12 22C12 22 8 20 6 18C4 16 2 12 2 12C2 12 4 14 6 14C8 14 12 12 12 12Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
-function GridLines() {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-40 mx-auto hidden max-w-7xl px-4 sm:px-6 lg:flex"
-    >
-      <div className="flex w-full justify-between">
-        <div className="w-px bg-foreground/[0.06]" />
-        <div className="w-px bg-foreground/[0.06]" />
-        <div className="w-px bg-foreground/[0.06]" />
-        <div className="w-px bg-foreground/[0.06]" />
-        <div className="w-px bg-foreground/[0.06]" />
-      </div>
-    </div>
-  );
-}
+import { Ornament, GridLines, DiscoverLink } from "@/components/shared/editorial";
 
 export default function Home() {
   return (
@@ -126,7 +77,7 @@ export default function Home() {
                 in a setting shaped by curiosity, warmth, and creative
                 precision.
               </p>
-              <DiscoverLink href="#about" />
+              <DiscoverLink href="/about" />
             </div>
 
             {/* Vertical divider */}
@@ -182,7 +133,7 @@ export default function Home() {
                 Mediterranean and South African cuisine, crafted with local
                 ingredients and countryside spirit.
               </p>
-              <DiscoverLink href="#menu" />
+              <DiscoverLink href="/menu" />
             </div>
           </div>
         </section>
@@ -209,7 +160,7 @@ export default function Home() {
                 parties, corporate events, and private functions for up to 400
                 guests.
               </p>
-              <DiscoverLink />
+              <DiscoverLink href="/about" />
             </div>
 
             {/* Vertical divider */}

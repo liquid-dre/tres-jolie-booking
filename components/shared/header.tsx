@@ -8,12 +8,12 @@ import { useState } from "react";
 
 const leftLinks = [
   { href: "/", label: "Home" },
-  { href: "#menu", label: "Menu" },
+  { href: "/menu", label: "Menu" },
 ];
 
 const rightLinks = [
-  { href: "#about", label: "About" },
-  { href: "#contact", label: "Contact" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const allLinks = [...leftLinks, ...rightLinks];
