@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/shared/header";
 import { Footer } from "@/components/shared/footer";
 import { GridLines, PageHero } from "@/components/shared/editorial";
+import { MenuSubnav } from "@/components/shared/menu-subnav";
 import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = {
@@ -55,8 +56,12 @@ export default async function MenuPage() {
       <main className="flex-1">
         <PageHero label="Culinary Experience" title="Menu" />
 
+        <MenuSubnav
+          categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+        />
+
         {categories.map((section, index) => (
-          <div key={section.id}>
+          <div key={section.id} id={section.id} className="scroll-mt-32 md:scroll-mt-36 lg:scroll-mt-40">
             {/* Divider */}
             <div className="border-t border-border" />
 
