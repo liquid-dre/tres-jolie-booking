@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { BookingStatus } from "@/generated/prisma";
+import { BookingStatus } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
