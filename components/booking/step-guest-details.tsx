@@ -125,9 +125,23 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
             >
               <Minus className="h-3 w-3" />
             </Button>
-            <span className="w-8 text-center font-medium tabular-nums">
-              {data.childrenCount}
-            </span>
+            <input
+              type="number"
+              min={0}
+              value={data.childrenCount}
+              onChange={(e) => {
+                const raw = e.target.value;
+                if (raw === "") {
+                  updateData({ childrenCount: 0 });
+                  return;
+                }
+                const n = parseInt(raw, 10);
+                if (!isNaN(n)) {
+                  updateData({ childrenCount: Math.max(0, n) });
+                }
+              }}
+              className="h-8 w-10 rounded-md border border-input bg-background text-center font-medium tabular-nums outline-none focus:border-ring focus:ring-2 focus:ring-ring/50 number-hide-spinners"
+            />
             <Button
               type="button"
               variant="outline"

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { FlipCalendar } from "@/components/ui/flip-calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -27,13 +27,24 @@ function isPast(date: Date) {
 export function StepDatePartySize({ data, updateData, onNext }: Props) {
   const selectedDate = data.date ? new Date(data.date) : undefined;
 
-  function handleSelect(date: Date | undefined) {
-    if (!date) return;
+  function handleSelect(date: Date) {
     updateData({
       date: date.toISOString().split("T")[0],
       time: "", // reset time when date changes
       mealPeriod: "",
     });
+  }
+
+  function handlePartySizeInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value;
+    if (raw === "") {
+      updateData({ partySize: 1 });
+      return;
+    }
+    const n = parseInt(raw, 10);
+    if (!isNaN(n)) {
+      updateData({ partySize: Math.max(1, Math.min(20, n)) });
+    }
   }
 
   function handleNext() {
@@ -58,12 +69,10 @@ export function StepDatePartySize({ data, updateData, onNext }: Props) {
         <div>
           <Label className="mb-2 block text-sm font-medium">Select a date</Label>
           <div className="flex justify-center">
-            <Calendar
-              mode="single"
+            <FlipCalendar
               selected={selectedDate}
               onSelect={handleSelect}
               disabled={(date) => isPast(date) || isMonday(date)}
-              className="rounded-md border"
             />
           </div>
         </div>
@@ -86,9 +95,14 @@ export function StepDatePartySize({ data, updateData, onNext }: Props) {
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="text-2xl font-bold tabular-nums w-12 text-center">
-              {data.partySize}
-            </span>
+            <input
+              type="number"
+              min={1}
+              max={20}
+              value={data.partySize}
+              onChange={handlePartySizeInput}
+              className="h-10 w-14 rounded-md border border-input bg-background text-center text-2xl font-bold tabular-nums outline-none focus:border-ring focus:ring-2 focus:ring-ring/50 number-hide-spinners"
+            />
             <Button
               type="button"
               variant="outline"
