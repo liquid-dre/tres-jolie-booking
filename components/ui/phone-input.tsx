@@ -55,34 +55,44 @@ type PhoneInputProps = {
   id?: string;
 };
 
-export function PhoneInput({ value, onChange, id }: PhoneInputProps) {
-  // Parse existing value to extract country code and local number
-  const parsed = React.useMemo(() => {
-    if (!value) return { countryCode: "ZA", localNumber: "" };
-
-    // Try to match against known dial codes (longest first)
-    const sorted = [...COUNTRIES].sort(
-      (a, b) => b.dial.length - a.dial.length
-    );
-    for (const country of sorted) {
-      if (value.startsWith(country.dial)) {
-        return {
-          countryCode: country.code,
-          localNumber: value.slice(country.dial.length),
-        };
-      }
+function matchCountry(phone: string) {
+  if (!phone) return null;
+  const sorted = [...COUNTRIES].sort(
+    (a, b) => b.dial.length - a.dial.length
+  );
+  for (const country of sorted) {
+    if (phone.startsWith(country.dial)) {
+      return country;
     }
+  }
+  return null;
+}
 
-    return { countryCode: "ZA", localNumber: value };
+export function PhoneInput({ value, onChange, id }: PhoneInputProps) {
+  const [countryCode, setCountryCode] = React.useState("ZA");
+
+  // Sync country code when value changes externally
+  React.useEffect(() => {
+    const match = matchCountry(value);
+    if (match) setCountryCode(match.code);
   }, [value]);
 
   const selectedCountry =
-    COUNTRIES.find((c) => c.code === parsed.countryCode) ?? COUNTRIES[0];
+    COUNTRIES.find((c) => c.code === countryCode) ?? COUNTRIES[0];
+
+  const localNumber = value && value.startsWith(selectedCountry.dial)
+    ? value.slice(selectedCountry.dial.length)
+    : value
+      ? (matchCountry(value)
+          ? value.slice(matchCountry(value)!.dial.length)
+          : value.replace(/^\+/, ""))
+      : "";
 
   function handleCountryChange(code: string) {
     const country = COUNTRIES.find((c) => c.code === code);
     if (!country) return;
-    onChange(parsed.localNumber ? `${country.dial}${parsed.localNumber}` : "");
+    setCountryCode(code);
+    onChange(localNumber ? `${country.dial}${localNumber}` : "");
   }
 
   function handleNumberChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -92,13 +102,13 @@ export function PhoneInput({ value, onChange, id }: PhoneInputProps) {
 
   return (
     <div className="flex gap-2">
-      <Select value={parsed.countryCode} onValueChange={handleCountryChange}>
-        <SelectTrigger className="w-[100px] shrink-0">
+      <Select value={countryCode} onValueChange={handleCountryChange}>
+        <SelectTrigger className="w-[120px] shrink-0">
           <SelectValue>
             {selectedCountry.flag} {selectedCountry.dial}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="w-[280px]">
           {COUNTRIES.map((country) => (
             <SelectItem key={country.code} value={country.code}>
               {country.flag} {country.name} ({country.dial})
@@ -109,7 +119,7 @@ export function PhoneInput({ value, onChange, id }: PhoneInputProps) {
       <Input
         id={id}
         type="tel"
-        value={parsed.localNumber}
+        value={localNumber}
         onChange={handleNumberChange}
         placeholder="Phone number"
         className="flex-1"
