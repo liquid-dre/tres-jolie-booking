@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseISO } from "date-fns";
 import { prisma } from "@/lib/db";
 import { bookingFormSchema } from "@/lib/validators/booking";
 import { generateReference, getMealPeriod } from "@/lib/booking-utils";
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     const booking = await prisma.booking.create({
       data: {
         reference,
-        date: new Date(data.date),
+        date: parseISO(data.date),
         time: data.time,
         mealPeriod,
         partySize: data.partySize,

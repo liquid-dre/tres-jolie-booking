@@ -1,3 +1,5 @@
+import { parseISO } from "date-fns";
+
 // Meal period values matching the Prisma enum — defined locally so this file
 // can be imported from both server and client components.
 export const MealPeriod = {
@@ -25,7 +27,7 @@ export function getMealPeriod(time: string): MealPeriodType {
 }
 
 export function formatDate(date: Date | string): string {
-  const d = typeof date === "string" ? new Date(date) : date;
+  const d = typeof date === "string" ? parseISO(date) : date;
   return d.toLocaleDateString("en-ZA", {
     weekday: "long",
     day: "numeric",
@@ -42,7 +44,7 @@ export function formatTime(time: string): string {
 }
 
 export function getDayOfWeek(date: Date | string): number {
-  const d = typeof date === "string" ? new Date(date) : date;
+  const d = typeof date === "string" ? parseISO(date) : date;
   // Convert JS day (0=Sun) to our schema (0=Mon)
   const jsDay = d.getDay();
   return jsDay === 0 ? 6 : jsDay - 1;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseISO } from "date-fns";
 import { prisma } from "@/lib/db";
 import { getDayOfWeek, getMealPeriod } from "@/lib/booking-utils";
 import { BookingStatus } from "@prisma/client";
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Date is required" }, { status: 400 });
   }
 
-  const bookingDate = new Date(date);
+  const bookingDate = parseISO(date);
   const dayOfWeek = getDayOfWeek(bookingDate);
 
   // Get operating hours for this day

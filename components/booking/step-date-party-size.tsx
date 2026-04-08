@@ -5,6 +5,7 @@ import { FlipCalendar } from "@/components/ui/flip-calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { format } from "date-fns";
 import { Minus, Plus, Users } from "lucide-react";
 import type { BookingData } from "@/app/book/page";
 
@@ -29,7 +30,7 @@ export function StepDatePartySize({ data, updateData, onNext }: Props) {
 
   function handleSelect(date: Date) {
     updateData({
-      date: date.toISOString().split("T")[0],
+      date: format(date, "yyyy-MM-dd"),
       time: "", // reset time when date changes
       mealPeriod: "",
     });

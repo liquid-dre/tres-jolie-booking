@@ -1,4 +1,5 @@
 import ical, { ICalCalendarMethod } from "ical-generator";
+import { format } from "date-fns";
 import { formatTime, MEAL_PERIOD_LABELS } from "./booking-utils";
 
 type CalendarEventData = {
@@ -63,11 +64,7 @@ export function generateGoogleCalendarUrl(data: CalendarEventData): string {
   const mealLabel =
     MEAL_PERIOD_LABELS[data.mealPeriod as string] || data.mealPeriod;
 
-  const formatGoogleDate = (d: Date) =>
-    d
-      .toISOString()
-      .replace(/[-:]/g, "")
-      .replace(/\.\d{3}/, "");
+  const formatGoogleDate = (d: Date) => format(d, "yyyyMMdd'T'HHmmss");
 
   const params = new URLSearchParams({
     action: "TEMPLATE",

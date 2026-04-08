@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -25,21 +27,43 @@ type Props = {
 };
 
 export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
+
   function handleNext() {
+    const newErrors: Record<string, boolean> = {};
+
     if (!data.guestName.trim()) {
-      toast.error("Please enter your name");
-      return;
+      newErrors.guestName = true;
     }
     if (!data.guestEmail.trim() || !data.guestEmail.includes("@")) {
-      toast.error("Please enter a valid email address");
-      return;
+      newErrors.guestEmail = true;
     }
-    const phoneRegex = /^(\+27|0)\d{9}$/;
+    const phoneRegex = /^\+\d{7,15}$/;
     if (!phoneRegex.test(data.guestPhone.replace(/\s/g, ""))) {
-      toast.error("Please enter a valid SA phone number (e.g. 0821234567)");
+      newErrors.guestPhone = true;
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      const first = Object.keys(newErrors)[0];
+      if (first === "guestName") toast.error("Please enter your name");
+      else if (first === "guestEmail") toast.error("Please enter a valid email address");
+      else if (first === "guestPhone") toast.error("Please enter a valid phone number");
       return;
     }
+
     onNext();
+  }
+
+  function clearError(field: string) {
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
   }
 
   return (
@@ -57,8 +81,9 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
           <Input
             id="guestName"
             value={data.guestName}
-            onChange={(e) => updateData({ guestName: e.target.value })}
+            onChange={(e) => { updateData({ guestName: e.target.value }); clearError("guestName"); }}
             placeholder="John Smith"
+            aria-invalid={errors.guestName}
           />
         </div>
 
@@ -68,8 +93,9 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
             id="guestEmail"
             type="email"
             value={data.guestEmail}
-            onChange={(e) => updateData({ guestEmail: e.target.value })}
+            onChange={(e) => { updateData({ guestEmail: e.target.value }); clearError("guestEmail"); }}
             placeholder="john@example.com"
+            aria-invalid={errors.guestEmail}
           />
           <p className="mt-1 text-xs text-muted-foreground">
             We&apos;ll send your confirmation and reminder here.
@@ -78,12 +104,11 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
 
         <div>
           <Label htmlFor="guestPhone">Phone *</Label>
-          <Input
+          <PhoneInput
             id="guestPhone"
-            type="tel"
             value={data.guestPhone}
-            onChange={(e) => updateData({ guestPhone: e.target.value })}
-            placeholder="082 123 4567"
+            onChange={(value) => { updateData({ guestPhone: value }); clearError("guestPhone"); }}
+            aria-invalid={errors.guestPhone}
           />
         </div>
 

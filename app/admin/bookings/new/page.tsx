@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -142,12 +143,10 @@ export default function NewBookingPage() {
 
             <div>
               <Label htmlFor="guestPhone">Phone *</Label>
-              <Input
+              <PhoneInput
                 id="guestPhone"
-                type="tel"
                 value={form.guestPhone}
-                onChange={(e) => update("guestPhone", e.target.value)}
-                required
+                onChange={(value) => update("guestPhone", value)}
               />
             </div>
 
