@@ -8,8 +8,8 @@ export const bookingFormSchema = z.object({
   guestEmail: z.string().email("Valid email is required"),
   guestPhone: z
     .string()
-    .min(10, "Valid phone number is required")
-    .regex(/^(\+27|0)\d{9}$/, "Please enter a valid SA phone number"),
+    .min(7, "Valid phone number is required")
+    .regex(/^\+\d{7,15}$/, "Please enter a valid phone number"),
   specialRequests: z.string().optional(),
   sectionPreference: z.enum(["INDOOR", "OUTDOOR", "NO_PREFERENCE"]).default("NO_PREFERENCE"),
   childrenCount: z.number().min(0).default(0),

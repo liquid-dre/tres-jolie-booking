@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -34,9 +35,9 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
       toast.error("Please enter a valid email address");
       return;
     }
-    const phoneRegex = /^(\+27|0)\d{9}$/;
+    const phoneRegex = /^\+\d{7,15}$/;
     if (!phoneRegex.test(data.guestPhone.replace(/\s/g, ""))) {
-      toast.error("Please enter a valid SA phone number (e.g. 0821234567)");
+      toast.error("Please enter a valid phone number");
       return;
     }
     onNext();
@@ -78,12 +79,10 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
 
         <div>
           <Label htmlFor="guestPhone">Phone *</Label>
-          <Input
+          <PhoneInput
             id="guestPhone"
-            type="tel"
             value={data.guestPhone}
-            onChange={(e) => updateData({ guestPhone: e.target.value })}
-            placeholder="082 123 4567"
+            onChange={(value) => updateData({ guestPhone: value })}
           />
         </div>
 
