@@ -49,7 +49,7 @@ async function sendCancellationEmail(booking: {
     const resend = new Resend(apiKey);
 
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || "Tres Jolie <noreply@tresjolie.co.za>",
+      from: process.env.EMAIL_FROM || "Tres Jolie <admin@accesshealthcare.co.zw>",
       to: booking.guestEmail,
       subject: `Booking Cancelled — ${booking.reference}`,
       html: `

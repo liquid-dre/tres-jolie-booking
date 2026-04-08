@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     try {
       await resend.emails.send({
-        from: process.env.EMAIL_FROM || "Tres Jolie <noreply@tresjolie.co.za>",
+        from: process.env.EMAIL_FROM || "Tres Jolie <admin@accesshealthcare.co.zw>",
         to: booking.guestEmail,
         subject: `Reminder: Your table tomorrow at Tres Jolie — ${booking.reference}`,
         html: `
