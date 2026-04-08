@@ -14,6 +14,7 @@ import {
   Settings,
   LogOut,
   Menu,
+  UtensilsCrossed,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/admin/bookings", label: "Bookings", icon: List },
   { href: "/admin/bookings/new", label: "New Booking", icon: PlusCircle },
   { href: "/admin/calendar", label: "Calendar", icon: CalendarDays },
+  { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

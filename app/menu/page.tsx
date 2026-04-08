@@ -3,51 +3,52 @@ import type { Metadata } from "next";
 import { Header } from "@/components/shared/header";
 import { Footer } from "@/components/shared/footer";
 import { GridLines, PageHero } from "@/components/shared/editorial";
+import { MenuSubnav } from "@/components/shared/menu-subnav";
+import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Menu",
 };
 
-const menuSections = [
-  {
-    label: "Morning",
-    title: "Breakfast",
-    time: "Tuesday — Sunday, 9:00 AM — 11:30 AM",
-    items: [
-      { name: "Farm-Style Eggs Benedict", description: "Free-range eggs, hollandaise, sourdough, smoked salmon or bacon" },
-      { name: "Tres Jolie Granola Bowl", description: "House-made granola, seasonal fruit, Greek yoghurt, honey" },
-      { name: "Buttermilk Pancakes", description: "Fluffy pancakes, berry compote, mascarpone, maple syrup" },
-      { name: "Garden Omelette", description: "Three-egg omelette, seasonal vegetables, feta, fresh herbs" },
-      { name: "Full Country Breakfast", description: "Eggs, bacon, boerewors, toast, grilled tomato, mushrooms" },
-    ],
-  },
-  {
-    label: "Afternoon",
-    title: "Lunch",
-    time: "Tuesday — Sunday, 12:00 PM — 5:30 PM",
-    items: [
-      { name: "Wood-Fired Margherita", description: "San Marzano tomatoes, fior di latte, fresh basil, olive oil" },
-      { name: "Cape Malay Curry", description: "Slow-cooked lamb, fragrant spices, basmati rice, sambals" },
-      { name: "Grilled Linefish", description: "Catch of the day, lemon butter, seasonal vegetables, herb salad" },
-      { name: "Garden Harvest Salad", description: "Mixed leaves, roasted vegetables, avo, seeds, citrus vinaigrette" },
-      { name: "Ribeye Steak", description: "300g aged ribeye, hand-cut chips, peppercorn sauce, garden salad" },
-    ],
-  },
-  {
-    label: "Evening",
-    title: "Dinner",
-    time: "Friday — Saturday, 6:00 PM — 10:00 PM",
-    items: [
-      { name: "Prawn Linguine", description: "Tiger prawns, garlic, chilli, white wine, cherry tomatoes, parsley" },
-      { name: "Lamb Shank", description: "Slow-braised lamb, red wine jus, creamy mash, roasted root vegetables" },
-      { name: "Duck Breast", description: "Pan-seared duck, plum glaze, dauphinoise potatoes, green beans" },
-      { name: "Seafood Platter for Two", description: "Grilled prawns, calamari, linefish, mussels, lemon butter" },
-      { name: "Chocolate Fondant", description: "Warm dark chocolate cake, vanilla bean ice cream, berry coulis" },
-    ],
-  },
-];
+export const dynamic = "force-dynamic";
 
-export default function MenuPage() {
+type CategoryWithItems = {
+  id: string;
+  name: string;
+  label: string;
+  sortOrder: number;
+  isActive: boolean;
+  items: {
+    id: string;
+    name: string;
+    description: string | null;
+    price: string;
+    sortOrder: number;
+    isActive: boolean;
+  }[];
+};
+
+async function getMenuCategories(): Promise<CategoryWithItems[]> {
+  try {
+    return await prisma.menuCategory.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+      include: {
+        items: {
+          where: { isActive: true },
+          orderBy: { sortOrder: "asc" },
+        },
+      },
+    });
+  } catch {
+    // Table may not exist yet if migration hasn't been run
+    return [];
+  }
+}
+
+export default async function MenuPage() {
+  const categories = await getMenuCategories();
+
   return (
     <>
       <GridLines />
@@ -55,8 +56,12 @@ export default function MenuPage() {
       <main className="flex-1">
         <PageHero label="Culinary Experience" title="Menu" />
 
-        {menuSections.map((section, index) => (
-          <div key={section.title}>
+        <MenuSubnav
+          categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+        />
+
+        {categories.map((section, index) => (
+          <div key={section.id} id={section.id} className="scroll-mt-32 md:scroll-mt-36 lg:scroll-mt-40">
             {/* Divider */}
             <div className="border-t border-border" />
 
@@ -68,11 +73,8 @@ export default function MenuPage() {
                     {section.label}
                   </p>
                   <h2 className="mt-4 font-serif text-4xl font-normal italic sm:text-5xl">
-                    {section.title}
+                    {section.name}
                   </h2>
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    {section.time}
-                  </p>
 
                   {/* Arch image on first section only */}
                   {index === 0 && (
@@ -96,15 +98,22 @@ export default function MenuPage() {
                   <div className="space-y-0">
                     {section.items.map((item, i) => (
                       <div
-                        key={item.name}
+                        key={item.id}
                         className={`py-6 ${i < section.items.length - 1 ? "border-b border-border" : ""}`}
                       >
-                        <h3 className="text-base font-normal text-foreground">
-                          {item.name}
-                        </h3>
-                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                          {item.description}
-                        </p>
+                        <div className="flex items-baseline justify-between gap-4">
+                          <h3 className="text-base font-normal text-foreground">
+                            {item.name}
+                          </h3>
+                          <span className="shrink-0 text-sm font-normal text-foreground">
+                            {item.price}
+                          </span>
+                        </div>
+                        {item.description && (
+                          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                            {item.description}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -123,8 +132,8 @@ export default function MenuPage() {
             Join Us for a Meal
           </h2>
           <p className="mx-auto mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Our menu changes with the seasons, celebrating the finest local
-            ingredients. Reserve your table to experience it firsthand.
+            Our menu celebrates the finest local ingredients. Reserve your table
+            to experience it firsthand.
           </p>
           <div className="mt-10">
             <Link
