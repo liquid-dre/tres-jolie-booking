@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2, Repeat } from "lucide-react";
 
 type OperatingHour = {
   id?: string;
@@ -24,17 +24,26 @@ type SpecialClosure = {
   id?: string;
   date: string;
   reason: string;
+  isRecurring: boolean;
+  recurrenceFrequency: string | null;
 };
 
 const dayLabels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const mealPeriods = ["BREAKFAST", "LUNCH", "DINNER"];
+
+const defaultTimes: Record<string, { open: string; close: string }> = {
+  BREAKFAST: { open: "09:00", close: "11:30" },
+  LUNCH: { open: "12:00", close: "17:30" },
+  DINNER: { open: "18:00", close: "22:00" },
+};
 
 export default function SettingsPage() {
   const [hours, setHours] = useState<OperatingHour[]>([]);
   const [closures, setClosures] = useState<SpecialClosure[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [newClosure, setNewClosure] = useState({ date: "", reason: "" });
+  const [newClosure, setNewClosure] = useState({ date: "", reason: "", isRecurring: false, recurrenceFrequency: "" });
+  const [addingSlotTo, setAddingSlotTo] = useState<number | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -43,7 +52,7 @@ export default function SettingsPage() {
         const data = await res.json();
         setHours(data.hours || []);
         setClosures(
-          (data.closures || []).map((c: { id: string; date: string; reason: string }) => ({
+          (data.closures || []).map((c: { id: string; date: string; reason: string; isRecurring: boolean; recurrenceFrequency: string | null }) => ({
             ...c,
             date: c.date.split("T")[0],
           }))
@@ -79,16 +88,26 @@ export default function SettingsPage() {
       toast.error("Please select a date");
       return;
     }
+    if (newClosure.isRecurring && !newClosure.recurrenceFrequency) {
+      toast.error("Please select a recurrence frequency");
+      return;
+    }
     try {
+      const closureData = {
+        date: newClosure.date,
+        reason: newClosure.reason,
+        isRecurring: newClosure.isRecurring,
+        recurrenceFrequency: newClosure.isRecurring ? newClosure.recurrenceFrequency : null,
+      };
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ closure: newClosure }),
+        body: JSON.stringify({ closure: closureData }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setClosures((prev) => [...prev, { ...newClosure, id: data.id }]);
-      setNewClosure({ date: "", reason: "" });
+      setClosures((prev) => [...prev, { ...closureData, id: data.id }]);
+      setNewClosure({ date: "", reason: "", isRecurring: false, recurrenceFrequency: "" });
       toast.success("Closure added.");
     } catch {
       toast.error("Failed to add closure");
@@ -102,6 +121,41 @@ export default function SettingsPage() {
       toast.success("Closure removed.");
     } catch {
       toast.error("Failed to remove closure");
+    }
+  }
+
+  async function addSlot(dayOfWeek: number, mealPeriod: string) {
+    const times = defaultTimes[mealPeriod];
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "operatingHour",
+          dayOfWeek,
+          mealPeriod,
+          openTime: times.open,
+          closeTime: times.close,
+          maxCovers: 200,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const created = await res.json();
+      setHours((prev) => [...prev, created]);
+      setAddingSlotTo(null);
+      toast.success(`${mealPeriod} slot added.`);
+    } catch {
+      toast.error("Failed to add slot");
+    }
+  }
+
+  async function deleteSlot(id: string) {
+    try {
+      await fetch(`/api/admin/settings?type=operatingHour&id=${id}`, { method: "DELETE" });
+      setHours((prev) => prev.filter((h) => h.id !== id));
+      toast.success("Slot removed.");
+    } catch {
+      toast.error("Failed to remove slot");
     }
   }
 
@@ -142,12 +196,16 @@ export default function SettingsPage() {
               .map((h, i) => ({ ...h, _index: i }))
               .filter((h) => h.dayOfWeek === dayIndex);
 
-            if (dayHours.length === 0) return null;
+            const usedPeriods = dayHours.map((h) => h.mealPeriod);
+            const availablePeriods = mealPeriods.filter((p) => !usedPeriods.includes(p));
 
             return (
               <div key={dayIndex}>
                 <h3 className="mb-2 text-sm font-semibold">{dayLabel}</h3>
                 <div className="space-y-2">
+                  {dayHours.length === 0 && (
+                    <p className="text-xs text-muted-foreground">No slots — closed</p>
+                  )}
                   {dayHours.map((h) => (
                     <div
                       key={h._index}
@@ -188,8 +246,53 @@ export default function SettingsPage() {
                           className="w-[80px]"
                         />
                       </div>
+                      {h.id && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => deleteSlot(h.id!)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
                     </div>
                   ))}
+
+                  {availablePeriods.length > 0 && (
+                    addingSlotTo === dayIndex ? (
+                      <div className="flex items-center gap-2">
+                        {availablePeriods.map((period) => (
+                          <Button
+                            key={period}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                            onClick={() => addSlot(dayIndex, period)}
+                          >
+                            {period}
+                          </Button>
+                        ))}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs"
+                          onClick={() => setAddingSlotTo(null)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => setAddingSlotTo(dayIndex)}
+                      >
+                        <Plus className="mr-1 h-3 w-3" /> Add Slot
+                      </Button>
+                    )
+                  )}
                 </div>
               </div>
             );
@@ -220,12 +323,18 @@ export default function SettingsPage() {
                   key={c.id}
                   className="flex items-center justify-between rounded border p-2"
                 >
-                  <div>
+                  <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">{c.date}</span>
                     {c.reason && (
-                      <span className="ml-2 text-sm text-muted-foreground">
+                      <span className="text-sm text-muted-foreground">
                         — {c.reason}
                       </span>
+                    )}
+                    {c.isRecurring && c.recurrenceFrequency && (
+                      <Badge variant="secondary" className="text-xs">
+                        <Repeat className="mr-1 h-3 w-3" />
+                        {c.recurrenceFrequency.charAt(0) + c.recurrenceFrequency.slice(1).toLowerCase()}
+                      </Badge>
                     )}
                   </div>
                   <Button
@@ -243,25 +352,58 @@ export default function SettingsPage() {
 
           <Separator />
 
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Input
-              type="date"
-              value={newClosure.date}
-              onChange={(e) =>
-                setNewClosure((prev) => ({ ...prev, date: e.target.value }))
-              }
-              className="sm:w-[180px]"
-            />
-            <Input
-              placeholder="Reason (optional)"
-              value={newClosure.reason}
-              onChange={(e) =>
-                setNewClosure((prev) => ({ ...prev, reason: e.target.value }))
-              }
-            />
-            <Button onClick={addClosure} variant="outline">
-              <Plus className="mr-1 h-4 w-4" /> Add
-            </Button>
+          <div className="space-y-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Input
+                type="date"
+                value={newClosure.date}
+                onChange={(e) =>
+                  setNewClosure((prev) => ({ ...prev, date: e.target.value }))
+                }
+                className="sm:w-[180px]"
+              />
+              <Input
+                placeholder="Reason (optional)"
+                value={newClosure.reason}
+                onChange={(e) =>
+                  setNewClosure((prev) => ({ ...prev, reason: e.target.value }))
+                }
+              />
+              <Button onClick={addClosure} variant="outline">
+                <Plus className="mr-1 h-4 w-4" /> Add
+              </Button>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={newClosure.isRecurring}
+                  onChange={(e) =>
+                    setNewClosure((prev) => ({
+                      ...prev,
+                      isRecurring: e.target.checked,
+                      recurrenceFrequency: e.target.checked ? prev.recurrenceFrequency : "",
+                    }))
+                  }
+                  className="h-4 w-4 rounded border"
+                />
+                Recurring
+              </label>
+              {newClosure.isRecurring && (
+                <select
+                  value={newClosure.recurrenceFrequency}
+                  onChange={(e) =>
+                    setNewClosure((prev) => ({ ...prev, recurrenceFrequency: e.target.value }))
+                  }
+                  className="h-9 rounded-md border bg-background px-3 text-sm"
+                >
+                  <option value="">Select frequency</option>
+                  <option value="WEEKLY">Weekly</option>
+                  <option value="MONTHLY">Monthly</option>
+                  <option value="YEARLY">Yearly</option>
+                </select>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

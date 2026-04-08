@@ -26,6 +26,12 @@ enum SectionPreference {
   NO_PREFERENCE
 }
 
+enum RecurrenceFrequency {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
 enum NotificationType {
   CONFIRMATION
   REMINDER
@@ -62,10 +68,12 @@ model OperatingHours {
 }
 
 model SpecialClosure {
-  id        String   @id @default(uuid()) @db.Uuid
-  date      DateTime @db.Date
-  reason    String?
-  createdAt DateTime @default(now()) @map("created_at")
+  id                  String               @id @default(uuid()) @db.Uuid
+  date                DateTime             @db.Date
+  reason              String?
+  isRecurring         Boolean              @default(false) @map("is_recurring")
+  recurrenceFrequency RecurrenceFrequency? @map("recurrence_frequency")
+  createdAt           DateTime             @default(now()) @map("created_at")
 
   @@map("special_closures")
 }

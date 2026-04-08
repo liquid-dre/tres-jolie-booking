@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { formatDate, formatTime, MEAL_PERIOD_LABELS } from "@/lib/booking-utils";
 import Link from "next/link";
+import { Eye } from "lucide-react";
 import { BookingsFilter } from "@/components/admin/bookings-filter";
 
 export const dynamic = "force-dynamic";
@@ -94,11 +95,12 @@ export default async function BookingsListPage({
                     <TableHead>Time</TableHead>
                     <TableHead>Guests</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {bookings.map((b) => (
-                    <TableRow key={b.id} className="cursor-pointer">
+                    <TableRow key={b.id}>
                       <TableCell>
                         <Link
                           href={`/admin/bookings/${b.id}`}
@@ -129,6 +131,14 @@ export default async function BookingsListPage({
                         <Badge className={statusColors[b.status]}>
                           {b.status}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/admin/bookings/${b.id}`}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -36,6 +36,18 @@ export async function POST(request: NextRequest) {
   }
 
   if (body.type === "item") {
+    // Check for duplicate item name across all categories
+    const existing = await prisma.menuItem.findFirst({
+      where: { name: { equals: body.name, mode: "insensitive" } },
+      include: { category: { select: { name: true } } },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: "duplicate", message: `A menu item named "${existing.name}" already exists in ${existing.category.name}` },
+        { status: 409 }
+      );
+    }
+
     const maxSort = await prisma.menuItem.aggregate({
       where: { categoryId: body.categoryId },
       _max: { sortOrder: true },
@@ -73,6 +85,21 @@ export async function PUT(request: NextRequest) {
   }
 
   if (body.type === "item") {
+    // Check for duplicate item name across all categories (excluding self)
+    const existing = await prisma.menuItem.findFirst({
+      where: {
+        name: { equals: body.name, mode: "insensitive" },
+        id: { not: body.id },
+      },
+      include: { category: { select: { name: true } } },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: "duplicate", message: `A menu item named "${existing.name}" already exists in ${existing.category.name}` },
+        { status: 409 }
+      );
+    }
+
     const item = await prisma.menuItem.update({
       where: { id: body.id },
       data: {

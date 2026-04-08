@@ -47,12 +47,30 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const { closure } = await request.json();
+  const body = await request.json();
 
+  if (body.type === "operatingHour") {
+    const created = await prisma.operatingHours.create({
+      data: {
+        dayOfWeek: body.dayOfWeek,
+        mealPeriod: body.mealPeriod,
+        openTime: body.openTime,
+        closeTime: body.closeTime,
+        maxCovers: body.maxCovers,
+        isActive: true,
+      },
+    });
+    return NextResponse.json(created);
+  }
+
+  // Default: create closure
+  const closure = body.closure;
   const created = await prisma.specialClosure.create({
     data: {
       date: new Date(closure.date),
       reason: closure.reason || null,
+      isRecurring: closure.isRecurring || false,
+      recurrenceFrequency: closure.recurrenceFrequency || null,
     },
   });
 
@@ -61,8 +79,19 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const closureId = searchParams.get("closureId");
+  const type = searchParams.get("type");
 
+  if (type === "operatingHour") {
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ error: "Missing id" }, { status: 400 });
+    }
+    await prisma.operatingHours.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  }
+
+  // Default: delete closure
+  const closureId = searchParams.get("closureId");
   if (!closureId) {
     return NextResponse.json({ error: "Missing closureId" }, { status: 400 });
   }

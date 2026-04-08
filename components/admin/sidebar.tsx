@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   UtensilsCrossed,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/admin/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
   { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/users", label: "Users", icon: Users },
 ];
 
 function NavContent({ pathname, onLogout }: { pathname: string; onLogout: () => void }) {
