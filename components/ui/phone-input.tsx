@@ -53,6 +53,7 @@ type PhoneInputProps = {
   value: string;
   onChange: (value: string) => void;
   id?: string;
+  "aria-invalid"?: boolean;
 };
 
 function matchCountry(phone: string) {
@@ -68,7 +69,7 @@ function matchCountry(phone: string) {
   return null;
 }
 
-export function PhoneInput({ value, onChange, id }: PhoneInputProps) {
+export function PhoneInput({ value, onChange, id, "aria-invalid": ariaInvalid }: PhoneInputProps) {
   const [countryCode, setCountryCode] = React.useState("ZA");
 
   // Sync country code when value changes externally
@@ -123,6 +124,7 @@ export function PhoneInput({ value, onChange, id }: PhoneInputProps) {
         onChange={handleNumberChange}
         placeholder="Phone number"
         className="flex-1"
+        aria-invalid={ariaInvalid}
       />
     </div>
   );
