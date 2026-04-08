@@ -25,11 +25,12 @@ export default function Home() {
 
           {/* Arch image — pulled up so heading overlaps it */}
           <div className="relative z-0 mx-auto -mt-6 flex max-w-6xl flex-col items-center sm:-mt-10 lg:-mt-16">
-            <div className="h-[320px] w-[260px] overflow-hidden rounded-t-full sm:h-[380px] sm:w-[320px] md:h-[420px] md:w-[360px]">
+            <div className="relative h-[320px] w-[260px] overflow-hidden rounded-t-full sm:h-[380px] sm:w-[320px] md:h-[420px] md:w-[360px]">
+              <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-white/60 via-white/20 to-transparent" />
               <img
                 src="/hero.jpg"
                 alt="Tres Jolie restaurant interior"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover brightness-125"
               />
             </div>
           </div>
