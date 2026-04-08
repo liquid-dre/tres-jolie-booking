@@ -26,15 +26,40 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ slots: [] });
   }
 
-  // Check for special closure
-  const closure = await prisma.specialClosure.findFirst({
+  // Check for exact-date special closure
+  const exactClosure = await prisma.specialClosure.findFirst({
     where: {
       date: bookingDate,
+      isRecurring: false,
     },
   });
 
-  if (closure) {
-    return NextResponse.json({ slots: [], closed: true, reason: closure.reason });
+  if (exactClosure) {
+    return NextResponse.json({ slots: [], closed: true, reason: exactClosure.reason });
+  }
+
+  // Check for recurring closures
+  const recurringClosures = await prisma.specialClosure.findMany({
+    where: { isRecurring: true },
+  });
+
+  for (const rc of recurringClosures) {
+    const closureDate = new Date(rc.date);
+    let matches = false;
+
+    if (rc.recurrenceFrequency === "YEARLY") {
+      matches =
+        bookingDate.getUTCMonth() === closureDate.getUTCMonth() &&
+        bookingDate.getUTCDate() === closureDate.getUTCDate();
+    } else if (rc.recurrenceFrequency === "MONTHLY") {
+      matches = bookingDate.getUTCDate() === closureDate.getUTCDate();
+    } else if (rc.recurrenceFrequency === "WEEKLY") {
+      matches = bookingDate.getUTCDay() === closureDate.getUTCDay();
+    }
+
+    if (matches) {
+      return NextResponse.json({ slots: [], closed: true, reason: rc.reason });
+    }
   }
 
   // Get existing bookings for this date (only confirmed/waitlisted)

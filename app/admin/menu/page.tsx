@@ -121,9 +121,26 @@ export default function AdminMenuPage() {
     }
   }
 
+  function findDuplicateItem(name: string, excludeItemId?: string): MenuCategory | null {
+    const normalized = name.trim().toLowerCase();
+    for (const cat of categories) {
+      for (const item of cat.items) {
+        if (item.name.trim().toLowerCase() === normalized && item.id !== excludeItemId) {
+          return cat;
+        }
+      }
+    }
+    return null;
+  }
+
   async function addItem(categoryId: string) {
     if (!newItem.name.trim() || !newItem.price.trim()) {
       toast.error("Name and price are required");
+      return;
+    }
+    const dupCat = findDuplicateItem(newItem.name);
+    if (dupCat) {
+      toast.error(`A menu item named "${newItem.name.trim()}" already exists in ${dupCat.name}`);
       return;
     }
     try {
@@ -179,6 +196,11 @@ export default function AdminMenuPage() {
   }
 
   async function saveEditItem(categoryId: string, itemId: string) {
+    const dupCat = findDuplicateItem(editForm.name, itemId);
+    if (dupCat) {
+      toast.error(`A menu item named "${editForm.name.trim()}" already exists in ${dupCat.name}`);
+      return;
+    }
     try {
       const res = await fetch("/api/admin/menu", {
         method: "PUT",
@@ -307,6 +329,66 @@ export default function AdminMenuPage() {
 
           {expandedCategories.has(category.id) && (
             <CardContent className="pt-0">
+              {addingItemTo === category.id ? (
+                <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-end">
+                  <div className="flex-1">
+                    <Label className="text-xs">Name</Label>
+                    <Input
+                      placeholder="Item name"
+                      value={newItem.name}
+                      onChange={(e) => setNewItem((p) => ({ ...p, name: e.target.value }))}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Label className="text-xs">Description</Label>
+                    <Input
+                      placeholder="Optional description"
+                      value={newItem.description}
+                      onChange={(e) =>
+                        setNewItem((p) => ({ ...p, description: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="w-full sm:w-28">
+                    <Label className="text-xs">Price</Label>
+                    <Input
+                      placeholder="R0.00"
+                      value={newItem.price}
+                      onChange={(e) => setNewItem((p) => ({ ...p, price: e.target.value }))}
+                    />
+                  </div>
+                  <div className="flex gap-1">
+                    <Button size="sm" onClick={() => addItem(category.id)}>
+                      <Check className="mr-1 h-4 w-4" /> Add
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setAddingItemTo(null);
+                        setNewItem({ name: "", description: "", price: "" });
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mb-3 text-xs"
+                  onClick={() => {
+                    setAddingItemTo(category.id);
+                    setNewItem({ name: "", description: "", price: "" });
+                  }}
+                >
+                  <Plus className="mr-1 h-3 w-3" /> Add Item
+                </Button>
+              )}
+
+              <Separator className="mb-3" />
+
               <div className="space-y-1">
                 {category.items.map((item) => (
                   <div key={item.id}>
@@ -396,65 +478,6 @@ export default function AdminMenuPage() {
                 ))}
               </div>
 
-              <Separator className="my-3" />
-
-              {addingItemTo === category.id ? (
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-                  <div className="flex-1">
-                    <Label className="text-xs">Name</Label>
-                    <Input
-                      placeholder="Item name"
-                      value={newItem.name}
-                      onChange={(e) => setNewItem((p) => ({ ...p, name: e.target.value }))}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <Label className="text-xs">Description</Label>
-                    <Input
-                      placeholder="Optional description"
-                      value={newItem.description}
-                      onChange={(e) =>
-                        setNewItem((p) => ({ ...p, description: e.target.value }))
-                      }
-                    />
-                  </div>
-                  <div className="w-full sm:w-28">
-                    <Label className="text-xs">Price</Label>
-                    <Input
-                      placeholder="R0.00"
-                      value={newItem.price}
-                      onChange={(e) => setNewItem((p) => ({ ...p, price: e.target.value }))}
-                    />
-                  </div>
-                  <div className="flex gap-1">
-                    <Button size="sm" onClick={() => addItem(category.id)}>
-                      <Check className="mr-1 h-4 w-4" /> Add
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setAddingItemTo(null);
-                        setNewItem({ name: "", description: "", price: "" });
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => {
-                    setAddingItemTo(category.id);
-                    setNewItem({ name: "", description: "", price: "" });
-                  }}
-                >
-                  <Plus className="mr-1 h-3 w-3" /> Add Item
-                </Button>
-              )}
             </CardContent>
           )}
         </Card>
