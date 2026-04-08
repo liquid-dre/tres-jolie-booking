@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Header } from "@/components/shared/header";
@@ -6,6 +7,13 @@ import { GridLines, PageHero, DiscoverLink } from "@/components/shared/editorial
 
 export const metadata: Metadata = {
   title: "About",
+  description:
+    "Learn about Tres Jolie — a countryside escape in Ruimsig, Johannesburg. Exquisite gardens, Mediterranean cuisine, and a family-friendly venue for up to 400 guests.",
+  openGraph: {
+    title: "About Tres Jolie",
+    description:
+      "A countryside escape in Ruimsig, Johannesburg — exquisite gardens, Mediterranean cuisine, and events for up to 400 guests.",
+  },
 };
 
 export default function AboutPage() {
@@ -13,7 +21,7 @@ export default function AboutPage() {
     <>
       <GridLines />
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <PageHero label="Tres Jolie Ruimsig" title="About" />
 
         {/* Divider */}
@@ -46,11 +54,13 @@ export default function AboutPage() {
             <div className="hidden w-px self-stretch bg-border md:block" />
 
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
-                <img
+              <div className="relative h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
+                <Image
                   src="/about.jpg"
-                  alt="Fine dining at Tres Jolie"
-                  className="h-full w-full object-cover"
+                  alt="Elegant dining setup at Tres Jolie with garden views"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 300px, 360px"
                 />
               </div>
             </div>
@@ -64,11 +74,13 @@ export default function AboutPage() {
         <section className="px-4 py-24 sm:py-32">
           <div className="mx-auto flex max-w-6xl flex-col-reverse gap-10 md:flex-row md:items-center">
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
-                <img
+              <div className="relative h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
+                <Image
                   src="/experience.jpg"
-                  alt="Garden venue at Tres Jolie"
-                  className="h-full w-full object-cover"
+                  alt="Guests dining in the outdoor garden area at Tres Jolie"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 300px, 360px"
                 />
               </div>
             </div>
@@ -127,11 +139,13 @@ export default function AboutPage() {
             <div className="hidden w-px self-stretch bg-border md:block" />
 
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
-                <img
+              <div className="relative h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
+                <Image
                   src="/hero.jpg"
-                  alt="Tres Jolie venue"
-                  className="h-full w-full object-cover"
+                  alt="Tres Jolie restaurant surrounded by lush gardens and water features"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 300px, 360px"
                 />
               </div>
             </div>

@@ -84,7 +84,13 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
             onChange={(e) => { updateData({ guestName: e.target.value }); clearError("guestName"); }}
             placeholder="John Smith"
             aria-invalid={errors.guestName}
+            aria-describedby={errors.guestName ? "guestName-error" : undefined}
           />
+          {errors.guestName && (
+            <p id="guestName-error" className="mt-1 text-xs text-destructive" role="alert">
+              Please enter your name
+            </p>
+          )}
         </div>
 
         <div>
@@ -96,10 +102,17 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
             onChange={(e) => { updateData({ guestEmail: e.target.value }); clearError("guestEmail"); }}
             placeholder="john@example.com"
             aria-invalid={errors.guestEmail}
+            aria-describedby={errors.guestEmail ? "guestEmail-error" : "guestEmail-hint"}
           />
-          <p className="mt-1 text-xs text-muted-foreground">
-            We&apos;ll send your confirmation and reminder here.
-          </p>
+          {errors.guestEmail ? (
+            <p id="guestEmail-error" className="mt-1 text-xs text-destructive" role="alert">
+              Please enter a valid email address
+            </p>
+          ) : (
+            <p id="guestEmail-hint" className="mt-1 text-xs text-muted-foreground">
+              We&apos;ll send your confirmation and reminder here.
+            </p>
+          )}
         </div>
 
         <div>
@@ -109,7 +122,13 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
             value={data.guestPhone}
             onChange={(value) => { updateData({ guestPhone: value }); clearError("guestPhone"); }}
             aria-invalid={errors.guestPhone}
+            aria-describedby={errors.guestPhone ? "guestPhone-error" : undefined}
           />
+          {errors.guestPhone && (
+            <p id="guestPhone-error" className="mt-1 text-xs text-destructive" role="alert">
+              Please enter a valid phone number
+            </p>
+          )}
         </div>
 
         <div>

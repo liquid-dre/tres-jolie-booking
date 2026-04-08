@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { formatDate, formatTime, MEAL_PERIOD_LABELS } from "@/lib/booking-utils";
 import Link from "next/link";
-import { Eye } from "lucide-react";
+import { Eye, Printer } from "lucide-react";
 import { BookingsFilter } from "@/components/admin/bookings-filter";
 
 export const dynamic = "force-dynamic";
@@ -59,12 +59,21 @@ export default async function BookingsListPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Bookings</h1>
-        <Link
-          href="/admin/bookings/new"
-          className="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          + New Booking
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href={`/admin/bookings/print?date=${new Date().toISOString().split("T")[0]}`}
+            className="inline-flex h-9 items-center gap-2 rounded-md border border-input bg-background px-4 text-sm font-medium hover:bg-secondary"
+          >
+            <Printer className="h-4 w-4" />
+            Print Today
+          </Link>
+          <Link
+            href="/admin/bookings/new"
+            className="inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            + New Booking
+          </Link>
+        </div>
       </div>
 
       <BookingsFilter

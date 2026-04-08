@@ -89,7 +89,8 @@ export function PhoneInput({ value, onChange, id, "aria-invalid": ariaInvalid }:
           : value.replace(/^\+/, ""))
       : "";
 
-  function handleCountryChange(code: string) {
+  function handleCountryChange(code: string | null) {
+    if (!code) return;
     const country = COUNTRIES.find((c) => c.code === code);
     if (!country) return;
     setCountryCode(code);

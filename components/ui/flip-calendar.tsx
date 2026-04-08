@@ -71,6 +71,7 @@ function CalendarDisplay({
           type="button"
           onClick={() => setVisible((pv) => !pv)}
           className="text-foreground transition-colors hover:text-foreground/60"
+          aria-label={visible ? "Hide calendar" : "Show calendar"}
         >
           {visible ? <FiArrowLeft /> : <FiEdit />}
         </button>
@@ -153,13 +154,13 @@ function DatePicker({
       className="mt-4 w-52 rounded-lg border border-[#B6BE9C] bg-white p-3 md:mt-0"
     >
       <div className="mb-2 flex items-center justify-between">
-        <button type="button" className="p-1" {...getBackProps({ calendars })}>
+        <button type="button" className="p-1" aria-label="Previous month" {...getBackProps({ calendars })}>
           <FiArrowLeft className="h-4 w-4" />
         </button>
         <span className="text-sm font-medium">
           {MONTH_NAMES[calendar.month]} {calendar.year}
         </span>
-        <button type="button" className="p-1" {...getForwardProps({ calendars })}>
+        <button type="button" className="p-1" aria-label="Next month" {...getForwardProps({ calendars })}>
           <FiArrowRight className="h-4 w-4" />
         </button>
       </div>
@@ -196,6 +197,8 @@ function DatePicker({
                   key={key}
                   {...getDateProps({ dateObj })}
                   disabled={isDisabled}
+                  aria-label={format(date, "EEEE, MMMM d, yyyy")}
+                  aria-disabled={isDisabled}
                   onClick={
                     isDisabled
                       ? (e) => e.preventDefault()

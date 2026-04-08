@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://tresjolie.co.za"),
   title: {
     default: "Tres Jolie | Book a Table",
     template: "%s | Tres Jolie",
@@ -16,6 +17,15 @@ export const metadata: Metadata = {
     "Johannesburg",
     "Mediterranean restaurant",
   ],
+  openGraph: {
+    siteName: "Tres Jolie",
+    locale: "en_ZA",
+    type: "website",
+    images: [{ url: "/hero.jpg", width: 1200, height: 630, alt: "Tres Jolie restaurant in Ruimsig, Johannesburg" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
@@ -38,6 +48,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-sans">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:bg-background focus:px-4 focus:py-2 focus:text-foreground focus:outline-none"
+        >
+          Skip to content
+        </a>
         {children}
         <Toaster richColors position="top-right" />
       </body>
