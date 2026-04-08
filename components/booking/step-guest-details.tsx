@@ -140,7 +140,7 @@ export function StepGuestDetails({ data, updateData, onNext, onBack }: Props) {
                   updateData({ childrenCount: Math.max(0, n) });
                 }
               }}
-              className="h-8 w-10 rounded-md border border-input bg-background text-center font-medium tabular-nums outline-none focus:border-ring focus:ring-2 focus:ring-ring/50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="h-8 w-10 rounded-md border border-input bg-background text-center font-medium tabular-nums outline-none focus:border-ring focus:ring-2 focus:ring-ring/50 number-hide-spinners"
             />
             <Button
               type="button"

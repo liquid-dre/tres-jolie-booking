@@ -29,7 +29,7 @@ export function FlipCalendar({ selected, onSelect, disabled }: FlipCalendarProps
   today.setHours(0, 0, 0, 0);
 
   return (
-    <div className="relative flex flex-col items-center text-foreground">
+    <div className="relative flex flex-col items-center text-foreground md:flex-row md:items-start md:gap-4">
       <CalendarDisplay
         index={index}
         date={date}
@@ -62,19 +62,23 @@ function CalendarDisplay({
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
-    <div className="w-fit overflow-hidden rounded-xl border-2 border-[#B6BE9C] bg-[#B6BE9C]">
-      <div className="flex items-center justify-between px-1.5 py-0.5">
-        <span className="text-center uppercase text-foreground">
+    <div className="w-52 overflow-hidden rounded-xl border-2 border-[#B6BE9C] bg-[#B6BE9C]">
+      <div className="flex items-center justify-between px-3 py-1">
+        <span className="text-sm font-medium uppercase text-foreground">
           {format(date, "LLLL")}
         </span>
         <button
+          type="button"
           onClick={() => setVisible((pv) => !pv)}
           className="text-foreground transition-colors hover:text-foreground/60"
         >
           {visible ? <FiArrowLeft /> : <FiEdit />}
         </button>
       </div>
-      <div className="relative z-0 h-36 w-52 shrink-0">
+      <div
+        className="relative h-36 w-full shrink-0"
+        style={{ perspective: "400px" }}
+      >
         <AnimatePresence mode="sync">
           <motion.div
             style={{
@@ -92,7 +96,7 @@ function CalendarDisplay({
             exit={{ rotateX: "-180deg" }}
             className="absolute inset-0"
           >
-            <div className="grid h-full w-full place-content-center rounded-lg bg-white text-6xl">
+            <div className="flex h-full w-full items-center justify-center rounded-lg bg-white text-6xl font-light">
               {format(date, "do")}
             </div>
           </motion.div>
@@ -112,9 +116,9 @@ function CalendarDisplay({
             }}
             className="absolute inset-0"
           >
-            <div className="relative grid h-full w-full place-content-center rounded-lg bg-white text-6xl">
+            <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white text-6xl font-light">
               {format(date, "do")}
-              <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs">
+              <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-muted-foreground">
                 {format(date, "yyyy")}
               </span>
             </div>
@@ -146,63 +150,64 @@ function DatePicker({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="-right-4 top-0 mt-4 w-fit rounded-lg border border-[#B6BE9C] bg-white p-3 md:absolute md:mt-0 md:translate-x-full"
+      className="mt-4 w-52 rounded-lg border border-[#B6BE9C] bg-white p-3 md:mt-0"
     >
       <div className="mb-2 flex items-center justify-between">
-        <button {...getBackProps({ calendars })}>
-          <FiArrowLeft />
+        <button type="button" className="p-1" {...getBackProps({ calendars })}>
+          <FiArrowLeft className="h-4 w-4" />
         </button>
-        <span>
+        <span className="text-sm font-medium">
           {MONTH_NAMES[calendar.month]} {calendar.year}
         </span>
-        <button {...getForwardProps({ calendars })}>
-          <FiArrowRight />
+        <button type="button" className="p-1" {...getForwardProps({ calendars })}>
+          <FiArrowRight className="h-4 w-4" />
         </button>
       </div>
-      <div key={`${calendar.month}${calendar.year}`} className="w-52">
-        <div className="mb-2 flex">
+      <div key={`${calendar.month}${calendar.year}`}>
+        <div className="grid grid-cols-7 mb-1">
           {WEEKDAY_NAMES.map((weekday) => (
             <div
               key={`${calendar.month}${calendar.year}${weekday}`}
-              className="block w-[calc(100%_/_7)] text-center text-xs"
+              className="text-center text-xs text-muted-foreground"
             >
               {weekday}
             </div>
           ))}
         </div>
-        {calendar.weeks.map((week, weekIndex) =>
-          week.map((dateObj, index) => {
-            const key = `${calendar.month}${calendar.year}${weekIndex}${index}`;
-            if (!dateObj) {
+        {calendar.weeks.map((week, weekIndex) => (
+          <div key={`week-${calendar.month}${calendar.year}${weekIndex}`} className="grid grid-cols-7">
+            {week.map((dateObj, idx) => {
+              const key = `${calendar.month}${calendar.year}${weekIndex}${idx}`;
+              if (!dateObj) {
+                return <div key={key} />;
+              }
+              const { date, selected, selectable } = dateObj;
+              const isDisabled = !selectable || (disabled?.(date) ?? false);
               return (
-                <div key={key} className="inline-block w-[calc(100%_/_7)]" />
+                <button
+                  type="button"
+                  className={`aspect-square rounded text-sm transition-colors ${
+                    selected
+                      ? "bg-[#B6BE9C] font-medium"
+                      : isDisabled
+                        ? "text-muted-foreground/40 cursor-not-allowed"
+                        : "hover:bg-[#B6BE9C]/20"
+                  }`}
+                  key={key}
+                  {...getDateProps({ dateObj })}
+                  disabled={isDisabled}
+                  onClick={
+                    isDisabled
+                      ? (e) => e.preventDefault()
+                      : getDateProps({ dateObj }).onClick
+                  }
+                >
+                  {date.getDate()}
+                </button>
               );
-            }
-            const { date, selected, selectable } = dateObj;
-            const isDisabled = !selectable || (disabled?.(date) ?? false);
-            return (
-              <button
-                className={`inline-block w-[calc(100%_/_7)] rounded text-sm transition-colors ${
-                  selected
-                    ? "bg-[#B6BE9C] text-foreground font-medium"
-                    : isDisabled
-                      ? "bg-transparent text-muted-foreground/40 cursor-not-allowed"
-                      : "bg-transparent hover:bg-[#B6BE9C]/20"
-                }`}
-                key={key}
-                {...getDateProps({ dateObj })}
-                disabled={isDisabled}
-                onClick={
-                  isDisabled
-                    ? (e) => e.preventDefault()
-                    : getDateProps({ dateObj }).onClick
-                }
-              >
-                {date.getDate()}
-              </button>
-            );
-          })
-        )}
+            })}
+          </div>
+        ))}
       </div>
     </motion.div>
   );

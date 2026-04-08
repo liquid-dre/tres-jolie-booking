@@ -101,7 +101,7 @@ export function StepDatePartySize({ data, updateData, onNext }: Props) {
               max={20}
               value={data.partySize}
               onChange={handlePartySizeInput}
-              className="h-10 w-14 rounded-md border border-input bg-background text-center text-2xl font-bold tabular-nums outline-none focus:border-ring focus:ring-2 focus:ring-ring/50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="h-10 w-14 rounded-md border border-input bg-background text-center text-2xl font-bold tabular-nums outline-none focus:border-ring focus:ring-2 focus:ring-ring/50 number-hide-spinners"
             />
             <Button
               type="button"
