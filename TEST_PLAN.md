@@ -6,6 +6,7 @@ Before testing, ensure:
 - [ ] App is running locally (`npm run dev`)
 - [ ] Database is migrated and seeded
 - [ ] Admin user is created in Supabase Auth
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` is set in `.env.local` (required for admin user management)
 - [ ] Resend API key is configured (for email tests)
 - [ ] Have access to the admin email inbox
 
@@ -151,6 +152,8 @@ Before testing, ensure:
 | 11.5 | Filter by status | Select "Confirmed" filter | Only confirmed bookings shown |
 | 11.6 | Filter by date | Select a date range | Only bookings in range shown |
 | 11.7 | Empty results | Search for non-existent name | "No bookings found" message |
+| 11.8 | Eye icon | View bookings table | Eye icon visible at end of each row |
+| 11.9 | Eye icon navigation | Click eye icon on a booking | Navigates to `/admin/bookings/[id]` detail page |
 
 ---
 
@@ -198,6 +201,54 @@ Before testing, ensure:
 | 15.4 | Add closure | Add a special closure date with reason | Closure saved, date blocked in booking calendar |
 | 15.5 | Remove closure | Delete a special closure | Closure removed, date available again |
 | 15.6 | Disable meal period | Toggle a meal period to inactive | Slots for that period no longer shown to guests |
+| 15.7 | Add meal slot | Click "+ Add Slot" on a day, select a meal period | New slot created with default times (e.g. DINNER 18:00-22:00) |
+| 15.8 | Available periods only | Click "+ Add Slot" on a day that already has BREAKFAST + LUNCH | Only DINNER is offered as an option |
+| 15.9 | Delete meal slot | Click trash icon on an existing slot | Slot removed, day updates immediately |
+| 15.10 | Day with no slots | Delete all slots from a day | Day shows "No slots — closed" |
+| 15.11 | Add recurring closure (yearly) | Add closure with "Recurring" checked, frequency "Yearly" | Closure saved with "Yearly" badge displayed |
+| 15.12 | Add recurring closure (weekly) | Add closure with frequency "Weekly" | Closure saved with "Weekly" badge |
+| 15.13 | Add recurring closure (monthly) | Add closure with frequency "Monthly" | Closure saved with "Monthly" badge |
+| 15.14 | Recurring frequency required | Check "Recurring" but leave frequency empty, click Add | Validation error: "Please select a recurrence frequency" |
+| 15.15 | Recurring closure blocks availability | Add yearly closure for Dec 25, check availability for Dec 25 of any year | Returns `closed: true` with reason |
+| 15.16 | Weekly recurring closure | Add weekly closure on a Monday, check availability for any Monday | Returns `closed: true` |
+| 15.17 | Monthly recurring closure | Add monthly closure for 15th, check availability for 15th of any month | Returns `closed: true` |
+| 15.18 | Delete recurring closure | Delete a recurring closure | Closure removed, previously blocked dates are available again |
+
+---
+
+## 15b. Admin Menu Management
+
+| # | Test Case | Steps | Expected Result |
+|---|-----------|-------|-----------------|
+| 15b.1 | Menu loads | Navigate to `/admin/menu` | Categories displayed with expand/collapse |
+| 15b.2 | Add item at top | Expand a category | "Add Item" button appears at top of category (above existing items) |
+| 15b.3 | Add valid item | Fill name + price, click Add | Item created, appears in list |
+| 15b.4 | Duplicate name (same category) | Add item with same name as existing item in same category | Error: "A menu item named '...' already exists in [category]" |
+| 15b.5 | Duplicate name (cross-category) | Add item with same name as item in a different category | Error: "A menu item named '...' already exists in [other category]" |
+| 15b.6 | Duplicate name (case-insensitive) | Add "Caesar Salad" when "caesar salad" exists | Blocked as duplicate |
+| 15b.7 | Edit item to duplicate | Edit an item's name to match another existing item | Error: duplicate blocked |
+| 15b.8 | Edit item keep same name | Edit item, keep same name, change price | Saves successfully (not flagged as self-duplicate) |
+| 15b.9 | Server-side duplicate (API) | POST to `/api/admin/menu` with duplicate name | Returns 409 with `{ error: "duplicate" }` |
+
+---
+
+## 15c. Admin User Management
+
+| # | Test Case | Steps | Expected Result |
+|---|-----------|-------|-----------------|
+| 15c.1 | Users page loads | Navigate to `/admin/users` | List of admin users displayed with email and created date |
+| 15c.2 | Users nav item | Check admin sidebar | "Users" link visible in navigation |
+| 15c.3 | Add admin button | Click "+ Add Admin" | Form appears with email and password fields |
+| 15c.4 | Create admin | Enter valid email + password (6+ chars), click Create | New admin appears in list, toast: "Admin user created" |
+| 15c.5 | Create admin - missing email | Submit with empty email | Error: "Email and password are required" |
+| 15c.6 | Create admin - short password | Enter password < 6 characters | Error: "Password must be at least 6 characters" |
+| 15c.7 | Create admin - duplicate email | Enter email of existing admin | Error message from Supabase |
+| 15c.8 | Login as new admin | Sign out, sign in with newly created credentials | Successfully logged in to admin dashboard |
+| 15c.9 | Delete admin (2+ admins) | With 2+ admins, click trash icon on one | Confirmation dialog, then admin removed from list |
+| 15c.10 | Delete last admin guard (UI) | With only 1 admin remaining | Delete button is hidden/replaced with "—" |
+| 15c.11 | Delete last admin guard (API) | DELETE `/api/admin/users?id=...` with only 1 user | Returns 400: "Cannot delete the last admin account. At least one admin must remain." |
+| 15c.12 | Missing service role key | Remove `SUPABASE_SERVICE_ROLE_KEY` from env, visit `/admin/users` | "Failed to load admin users" error |
+| 15c.13 | Cancel form | Click "+ Add Admin", then click X | Form closes, no changes made |
 
 ---
 
@@ -218,6 +269,9 @@ curl "http://localhost:3000/api/bookings/availability?date=2026-04-10&partySize=
 | 16.2 | Monday | Returns empty or error (restaurant closed) |
 | 16.3 | Past date | Returns error or empty slots |
 | 16.4 | Special closure date | Returns empty or closed message |
+| 16.4b | Yearly recurring closure | Add yearly closure for a date, query same month/day in different year | Returns `{ closed: true }` |
+| 16.4c | Weekly recurring closure | Add weekly closure for a weekday, query same weekday | Returns `{ closed: true }` |
+| 16.4d | Monthly recurring closure | Add monthly closure for day 15, query 15th of another month | Returns `{ closed: true }` |
 
 ### Booking Creation API
 
@@ -245,6 +299,70 @@ curl -X POST http://localhost:3000/api/bookings/cancel/[cancel-token]
 | 16.9 | Valid token | 200, booking cancelled |
 | 16.10 | Invalid token | 404, not found |
 | 16.11 | Already cancelled | 400, already cancelled |
+
+### Admin Users API
+
+```bash
+# List admin users
+curl http://localhost:3000/api/admin/users
+
+# Create admin user
+curl -X POST http://localhost:3000/api/admin/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"newadmin@example.com","password":"securepass123"}'
+
+# Delete admin user
+curl -X DELETE "http://localhost:3000/api/admin/users?id=[user-id]"
+```
+
+| # | Test Case | Expected |
+|---|-----------|----------|
+| 16.14 | List users | 200 with array of `{ id, email, createdAt }` |
+| 16.15 | Create user | 200 with new user object |
+| 16.16 | Create user - missing fields | 400 with "Email and password are required" |
+| 16.17 | Create user - short password | 400 with "Password must be at least 6 characters" |
+| 16.18 | Delete user | 200 with `{ success: true }` |
+| 16.19 | Delete last user | 400 with "Cannot delete the last admin account" |
+
+### Admin Settings API (Operating Hours)
+
+```bash
+# Add meal slot
+curl -X POST http://localhost:3000/api/admin/settings \
+  -H "Content-Type: application/json" \
+  -d '{"type":"operatingHour","dayOfWeek":0,"mealPeriod":"DINNER","openTime":"18:00","closeTime":"22:00","maxCovers":200}'
+
+# Delete meal slot
+curl -X DELETE "http://localhost:3000/api/admin/settings?type=operatingHour&id=[slot-id]"
+
+# Add recurring closure
+curl -X POST http://localhost:3000/api/admin/settings \
+  -H "Content-Type: application/json" \
+  -d '{"closure":{"date":"2026-12-25","reason":"Christmas Day","isRecurring":true,"recurrenceFrequency":"YEARLY"}}'
+```
+
+| # | Test Case | Expected |
+|---|-----------|----------|
+| 16.20 | Create operating hour slot | 200 with created slot object |
+| 16.21 | Delete operating hour slot | 200 with `{ success: true }` |
+| 16.22 | Create recurring closure | 200 with `{ id }` |
+| 16.23 | Delete closure by ID | 200 with `{ success: true }` |
+| 16.24 | Delete missing closure ID | 400 with "Missing closureId" |
+
+### Admin Menu API (Duplicate Detection)
+
+```bash
+# Create menu item (duplicate)
+curl -X POST http://localhost:3000/api/admin/menu \
+  -H "Content-Type: application/json" \
+  -d '{"type":"item","categoryId":"[id]","name":"Existing Item Name","price":"R99.00"}'
+```
+
+| # | Test Case | Expected |
+|---|-----------|----------|
+| 16.25 | Create item with duplicate name | 409 with `{ error: "duplicate", message: "...already exists in [category]" }` |
+| 16.26 | Update item to duplicate name | 409 with `{ error: "duplicate" }` |
+| 16.27 | Update item keep same name | 200 with updated item (no self-duplicate) |
 
 ### Reminders Cron
 
@@ -299,11 +417,13 @@ Test at these viewport widths: 375px (phone), 768px (tablet), 1024px (small lapt
 - [ ] Cancellation flow works end-to-end (8.1 - 8.7)
 - [ ] Admin auth works (9.1 - 9.6)
 - [ ] Admin dashboard accurate (10.1 - 10.4)
-- [ ] Admin bookings list + filters work (11.1 - 11.7)
+- [ ] Admin bookings list + filters + eye icon work (11.1 - 11.9)
 - [ ] Admin booking detail + status changes work (12.1 - 12.5)
 - [ ] Manual booking creation works (13.1 - 13.4)
 - [ ] Admin calendar view works (14.1 - 14.4)
-- [ ] Admin settings CRUD works (15.1 - 15.6)
-- [ ] All API endpoints return correct responses (16.1 - 16.13)
+- [ ] Admin settings — hours + slots + closures work (15.1 - 15.18)
+- [ ] Admin menu — CRUD + duplicate detection works (15b.1 - 15b.9)
+- [ ] Admin user management works (15c.1 - 15c.13)
+- [ ] All API endpoints return correct responses (16.1 - 16.27)
 - [ ] Mobile responsive on all pages (17.1 - 17.5)
 - [ ] Edge cases handled (18.1 - 18.10)
