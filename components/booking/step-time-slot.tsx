@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatTime } from "@/lib/booking-utils";
 import type { BookingData } from "@/app/book/page";
 
@@ -94,11 +95,20 @@ export function StepTimeSlot({ data, updateData, onNext, onBack }: Props) {
       </CardHeader>
       <CardContent className="space-y-6">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <span className="ml-2 text-sm text-muted-foreground">
-              Checking availability...
-            </span>
+          <div className="space-y-6">
+            {[0, 1].map((i) => (
+              <div key={i}>
+                <div className="mb-3 flex items-center gap-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-px flex-1" />
+                </div>
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                  {Array.from({ length: 8 }).map((_, j) => (
+                    <Skeleton key={j} className="h-10 rounded-md" />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         ) : slots.length === 0 ? (
           <div className="py-8 text-center">

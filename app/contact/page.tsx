@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Header } from "@/components/shared/header";
@@ -6,6 +7,13 @@ import { GridLines, PageHero } from "@/components/shared/editorial";
 
 export const metadata: Metadata = {
   title: "Contact",
+  description:
+    "Find Tres Jolie at Plot 22 Peter Road, Ruimsig, Roodepoort. Opening hours, directions, phone, and email. Plan your visit or enquire about private events.",
+  openGraph: {
+    title: "Contact | Tres Jolie",
+    description:
+      "Plot 22 Peter Road, Ruimsig, Roodepoort. Opening hours, directions, and contact details.",
+  },
 };
 
 export default function ContactPage() {
@@ -13,7 +21,7 @@ export default function ContactPage() {
     <>
       <GridLines />
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <PageHero label="Get in Touch" title="Contact" />
 
         {/* Divider */}
@@ -162,11 +170,13 @@ export default function ContactPage() {
             <div className="hidden w-px self-stretch bg-border md:block" />
 
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
-                <img
+              <div className="relative h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
+                <Image
                   src="/about.jpg"
-                  alt="Tres Jolie interior"
-                  className="h-full w-full object-cover"
+                  alt="Elegant dining setup at Tres Jolie with garden views"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 300px, 360px"
                 />
               </div>
             </div>

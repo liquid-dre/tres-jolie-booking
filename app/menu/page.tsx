@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Header } from "@/components/shared/header";
@@ -8,6 +9,13 @@ import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Menu",
+  description:
+    "Explore the Tres Jolie menu — wood-fired pizzas, Cape Malay curries, fresh seafood, hearty steaks, and more. Mediterranean and South African cuisine in Ruimsig.",
+  openGraph: {
+    title: "Menu | Tres Jolie",
+    description:
+      "Wood-fired pizzas, Cape Malay curries, fresh seafood, and hearty steaks — Mediterranean and South African cuisine.",
+  },
 };
 
 export const dynamic = "force-dynamic";
@@ -53,7 +61,7 @@ export default async function MenuPage() {
     <>
       <GridLines />
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <PageHero label="Culinary Experience" title="Menu" />
 
         <MenuSubnav
@@ -79,11 +87,13 @@ export default async function MenuPage() {
                   {/* Arch image on first section only */}
                   {index === 0 && (
                     <div className="mt-10 hidden md:block">
-                      <div className="h-[300px] w-[220px] overflow-hidden rounded-t-full">
-                        <img
+                      <div className="relative h-[300px] w-[220px] overflow-hidden rounded-t-full">
+                        <Image
                           src="/menu.jpg"
-                          alt="Cuisine at Tres Jolie"
-                          className="h-full w-full object-cover"
+                          alt="Artfully plated Mediterranean cuisine at Tres Jolie"
+                          fill
+                          className="object-cover"
+                          sizes="220px"
                         />
                       </div>
                     </div>

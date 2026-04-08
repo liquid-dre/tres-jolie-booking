@@ -55,7 +55,7 @@ export default function BookPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 px-4 py-10 sm:py-16">
+      <main id="main-content" className="flex-1 px-4 py-10 sm:py-16">
         <div className="mx-auto max-w-2xl">
           <h1 className="text-center text-2xl font-bold sm:text-3xl">
             Book a Table

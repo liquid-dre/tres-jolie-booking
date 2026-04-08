@@ -1,14 +1,44 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/shared/header";
 import { Footer } from "@/components/shared/footer";
 import { Ornament, GridLines, DiscoverLink } from "@/components/shared/editorial";
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  name: "Tres Jolie",
+  description:
+    "A Mediterranean country restaurant in Ruimsig, Johannesburg. Wood-fired pizzas, Cape Malay curries, fresh seafood, and hearty steaks surrounded by exquisite gardens.",
+  url: "https://tresjolie.co.za",
+  telephone: "+27117942473",
+  email: "info@tresjolie.co.za",
+  servesCuisine: ["Mediterranean", "South African"],
+  priceRange: "$$",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Plot 22 Peter Road",
+    addressLocality: "Ruimsig, Roodepoort",
+    addressRegion: "Gauteng",
+    addressCountry: "ZA",
+  },
+  openingHoursSpecification: [
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "09:00", closes: "11:30" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "12:00", closes: "17:30" },
+    { "@type": "OpeningHoursSpecification", dayOfWeek: ["Friday", "Saturday"], opens: "18:00", closes: "22:00" },
+  ],
+};
+
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <GridLines />
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* Hero */}
         <section className="relative px-4 pb-6 pt-4 sm:pt-6 lg:pt-8">
           {/* Heading — overlaps the image */}
@@ -27,10 +57,13 @@ export default function Home() {
           <div className="relative z-0 mx-auto -mt-6 flex max-w-6xl flex-col items-center sm:-mt-10 lg:-mt-16">
             <div className="relative h-[320px] w-[260px] overflow-hidden rounded-t-full sm:h-[380px] sm:w-[320px] md:h-[420px] md:w-[360px]">
               <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-white/60 via-white/20 to-transparent" />
-              <img
+              <Image
                 src="/hero.jpg"
-                alt="Tres Jolie restaurant interior"
-                className="h-full w-full object-cover brightness-125"
+                alt="Tres Jolie restaurant surrounded by lush gardens and water features"
+                fill
+                priority
+                className="object-cover brightness-125"
+                sizes="(max-width: 640px) 260px, (max-width: 768px) 320px, 360px"
               />
             </div>
           </div>
@@ -86,11 +119,13 @@ export default function Home() {
 
             {/* Arch image */}
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
-                <img
+              <div className="relative h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
+                <Image
                   src="/about.jpg"
-                  alt="Fine dining at Tres Jolie"
-                  className="h-full w-full object-cover"
+                  alt="Elegant dining setup at Tres Jolie with garden views"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 300px, 360px"
                 />
               </div>
             </div>
@@ -108,11 +143,13 @@ export default function Home() {
           <div className="mx-auto flex max-w-6xl flex-col-reverse gap-10 md:flex-row md:items-center">
             {/* Dark panel with arch image */}
             <div className="flex flex-1 items-center justify-center rounded-none bg-foreground/95 py-16 md:py-20">
-              <div className="h-[380px] w-[260px] overflow-hidden rounded-t-full sm:h-[440px] sm:w-[300px]">
-                <img
+              <div className="relative h-[380px] w-[260px] overflow-hidden rounded-t-full sm:h-[440px] sm:w-[300px]">
+                <Image
                   src="/menu.jpg"
-                  alt="Cuisine at Tres Jolie"
-                  className="h-full w-full object-cover"
+                  alt="Artfully plated Mediterranean cuisine at Tres Jolie"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 260px, 300px"
                 />
               </div>
             </div>
@@ -169,11 +206,13 @@ export default function Home() {
 
             {/* Arch image */}
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
-                <img
+              <div className="relative h-[400px] w-[300px] overflow-hidden rounded-t-full sm:h-[480px] sm:w-[360px]">
+                <Image
                   src="/experience.jpg"
-                  alt="Garden dining at Tres Jolie"
-                  className="h-full w-full object-cover"
+                  alt="Guests dining in the outdoor garden area at Tres Jolie"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 300px, 360px"
                 />
               </div>
             </div>
