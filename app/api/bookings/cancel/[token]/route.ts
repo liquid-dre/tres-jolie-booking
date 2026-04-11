@@ -5,29 +5,38 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
-  const { token } = await params;
+  try {
+    const { token } = await params;
 
-  const booking = await prisma.booking.findUnique({
-    where: { cancelToken: token },
-  });
+    const booking = await prisma.booking.findUnique({
+      where: { cancelToken: token },
+    });
 
-  if (!booking) {
-    return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    if (!booking) {
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    if (booking.status === "CANCELLED") {
+      return NextResponse.json({ error: "Already cancelled" }, { status: 400 });
+    }
+
+    await prisma.booking.update({
+      where: { id: booking.id },
+      data: { status: "CANCELLED" },
+    });
+
+    // Send cancellation email
+    sendCancellationEmail(booking).catch(console.error);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("POST /api/bookings/cancel error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { error: "Failed to cancel booking", message },
+      { status: 500 }
+    );
   }
-
-  if (booking.status === "CANCELLED") {
-    return NextResponse.json({ error: "Already cancelled" }, { status: 400 });
-  }
-
-  await prisma.booking.update({
-    where: { id: booking.id },
-    data: { status: "CANCELLED" },
-  });
-
-  // Send cancellation email
-  sendCancellationEmail(booking).catch(console.error);
-
-  return NextResponse.json({ success: true });
 }
 
 async function sendCancellationEmail(booking: {
