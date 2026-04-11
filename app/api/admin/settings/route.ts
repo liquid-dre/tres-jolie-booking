@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { defaultHours } from "@/lib/default-hours";
 
 export async function GET() {
   const [hours, closures] = await Promise.all([
@@ -48,6 +49,36 @@ export async function PUT(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
+
+  if (body.type === "seedDefaults") {
+    const results = [];
+    for (const h of defaultHours) {
+      const upserted = await prisma.operatingHours.upsert({
+        where: {
+          dayOfWeek_mealPeriod: {
+            dayOfWeek: h.dayOfWeek,
+            mealPeriod: h.mealPeriod,
+          },
+        },
+        update: {
+          openTime: h.openTime,
+          closeTime: h.closeTime,
+          maxCovers: h.maxCovers,
+          isActive: true,
+        },
+        create: {
+          dayOfWeek: h.dayOfWeek,
+          mealPeriod: h.mealPeriod,
+          openTime: h.openTime,
+          closeTime: h.closeTime,
+          maxCovers: h.maxCovers,
+          isActive: true,
+        },
+      });
+      results.push(upserted);
+    }
+    return NextResponse.json({ hours: results });
+  }
 
   if (body.type === "operatingHour") {
     const created = await prisma.operatingHours.create({

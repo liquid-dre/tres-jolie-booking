@@ -43,6 +43,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [newClosure, setNewClosure] = useState({ date: "", reason: "", isRecurring: false, recurrenceFrequency: "" });
+  const [seeding, setSeeding] = useState(false);
   const [addingSlotTo, setAddingSlotTo] = useState<number | null>(null);
 
   useEffect(() => {
@@ -167,6 +168,27 @@ export default function SettingsPage() {
     });
   }
 
+  async function seedDefaults() {
+    setSeeding(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "seedDefaults" }),
+      });
+      if (!res.ok) throw new Error();
+      // Re-fetch all hours to get complete state
+      const refetch = await fetch("/api/admin/settings");
+      const data = await refetch.json();
+      setHours(data.hours || []);
+      toast.success("Default time slots seeded successfully.");
+    } catch {
+      toast.error("Failed to seed default time slots");
+    } finally {
+      setSeeding(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -186,9 +208,22 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {hours.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              No operating hours configured. They will be seeded when the database is initialized.
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                No operating hours configured.
+              </p>
+              <Button onClick={seedDefaults} disabled={seeding} variant="outline">
+                {seeding ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Seeding...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-1 h-4 w-4" /> Seed Default Time Slots
+                  </>
+                )}
+              </Button>
+            </div>
           )}
 
           {dayLabels.map((dayLabel, dayIndex) => {
@@ -298,15 +333,36 @@ export default function SettingsPage() {
             );
           })}
 
-          <Button onClick={saveHours} disabled={saving}>
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
-              </>
-            ) : (
-              "Save Hours"
+          <div className="flex items-center gap-2">
+            <Button onClick={saveHours} disabled={saving}>
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                </>
+              ) : (
+                "Save Hours"
+              )}
+            </Button>
+            {hours.length > 0 && (
+              <Button
+                onClick={() => {
+                  if (confirm("This will reset all time slots to defaults. Continue?")) {
+                    seedDefaults();
+                  }
+                }}
+                disabled={seeding}
+                variant="outline"
+              >
+                {seeding ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Seeding...
+                  </>
+                ) : (
+                  "Reset to Defaults"
+                )}
+              </Button>
             )}
-          </Button>
+          </div>
         </CardContent>
       </Card>
 
