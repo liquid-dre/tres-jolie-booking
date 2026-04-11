@@ -87,6 +87,17 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Mobile Reserve CTA — visible only below md where header CTA is hidden */}
+        <div className="flex justify-center px-4 pb-10 md:hidden">
+          <Link
+            href="/book"
+            className="inline-flex items-center gap-3 border border-foreground px-8 py-3 text-[11px] font-normal uppercase tracking-[0.2em] text-foreground transition-colors hover:bg-foreground hover:text-background"
+          >
+            Reserve Now
+            <span className="text-base">&#8594;</span>
+          </Link>
+        </div>
+
         {/* Divider */}
         <div className="border-t border-border" />
 

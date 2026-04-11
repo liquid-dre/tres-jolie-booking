@@ -20,7 +20,7 @@ export function generateIcsContent(data: CalendarEventData): string {
   const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // 2 hours
 
   const mealLabel =
-    MEAL_PERIOD_LABELS[data.mealPeriod as string] || data.mealPeriod;
+    MEAL_PERIOD_LABELS[data.mealPeriod] || data.mealPeriod;
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
@@ -62,7 +62,7 @@ export function generateGoogleCalendarUrl(data: CalendarEventData): string {
   const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
 
   const mealLabel =
-    MEAL_PERIOD_LABELS[data.mealPeriod as string] || data.mealPeriod;
+    MEAL_PERIOD_LABELS[data.mealPeriod] || data.mealPeriod;
 
   const formatGoogleDate = (d: Date) => format(d, "yyyyMMdd'T'HHmmss");
 
