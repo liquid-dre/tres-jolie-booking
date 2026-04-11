@@ -3,16 +3,24 @@ import { prisma } from "@/lib/db";
 import { defaultHours } from "@/lib/default-hours";
 
 export async function GET() {
-  const [hours, closures] = await Promise.all([
-    prisma.operatingHours.findMany({
-      orderBy: [{ dayOfWeek: "asc" }, { mealPeriod: "asc" }],
-    }),
-    prisma.specialClosure.findMany({
-      orderBy: { date: "asc" },
-    }),
-  ]);
+  try {
+    const [hours, closures] = await Promise.all([
+      prisma.operatingHours.findMany({
+        orderBy: [{ dayOfWeek: "asc" }, { mealPeriod: "asc" }],
+      }),
+      prisma.specialClosure.findMany({
+        orderBy: { date: "asc" },
+      }),
+    ]);
 
-  return NextResponse.json({ hours, closures });
+    return NextResponse.json({ hours, closures });
+  } catch (error) {
+    console.error("Failed to fetch settings:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch settings" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PUT(request: NextRequest) {
@@ -48,64 +56,72 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  try {
+    const body = await request.json();
 
-  if (body.type === "seedDefaults") {
-    const results = [];
-    for (const h of defaultHours) {
-      const upserted = await prisma.operatingHours.upsert({
-        where: {
-          dayOfWeek_mealPeriod: {
+    if (body.type === "seedDefaults") {
+      const results = [];
+      for (const h of defaultHours) {
+        const upserted = await prisma.operatingHours.upsert({
+          where: {
+            dayOfWeek_mealPeriod: {
+              dayOfWeek: h.dayOfWeek,
+              mealPeriod: h.mealPeriod,
+            },
+          },
+          update: {
+            openTime: h.openTime,
+            closeTime: h.closeTime,
+            maxCovers: h.maxCovers,
+            isActive: true,
+          },
+          create: {
             dayOfWeek: h.dayOfWeek,
             mealPeriod: h.mealPeriod,
+            openTime: h.openTime,
+            closeTime: h.closeTime,
+            maxCovers: h.maxCovers,
+            isActive: true,
           },
-        },
-        update: {
-          openTime: h.openTime,
-          closeTime: h.closeTime,
-          maxCovers: h.maxCovers,
-          isActive: true,
-        },
-        create: {
-          dayOfWeek: h.dayOfWeek,
-          mealPeriod: h.mealPeriod,
-          openTime: h.openTime,
-          closeTime: h.closeTime,
-          maxCovers: h.maxCovers,
+        });
+        results.push(upserted);
+      }
+      return NextResponse.json({ hours: results });
+    }
+
+    if (body.type === "operatingHour") {
+      const created = await prisma.operatingHours.create({
+        data: {
+          dayOfWeek: body.dayOfWeek,
+          mealPeriod: body.mealPeriod,
+          openTime: body.openTime,
+          closeTime: body.closeTime,
+          maxCovers: body.maxCovers,
           isActive: true,
         },
       });
-      results.push(upserted);
+      return NextResponse.json(created);
     }
-    return NextResponse.json({ hours: results });
-  }
 
-  if (body.type === "operatingHour") {
-    const created = await prisma.operatingHours.create({
+    // Default: create closure
+    const closure = body.closure;
+    const created = await prisma.specialClosure.create({
       data: {
-        dayOfWeek: body.dayOfWeek,
-        mealPeriod: body.mealPeriod,
-        openTime: body.openTime,
-        closeTime: body.closeTime,
-        maxCovers: body.maxCovers,
-        isActive: true,
+        date: new Date(closure.date),
+        reason: closure.reason || null,
+        isRecurring: closure.isRecurring || false,
+        recurrenceFrequency: closure.recurrenceFrequency || null,
       },
     });
-    return NextResponse.json(created);
+
+    return NextResponse.json({ id: created.id });
+  } catch (error) {
+    console.error("Failed to process settings POST:", error);
+    return NextResponse.json(
+      { error: "Failed to process request" },
+      { status: 500 }
+    );
   }
-
-  // Default: create closure
-  const closure = body.closure;
-  const created = await prisma.specialClosure.create({
-    data: {
-      date: new Date(closure.date),
-      reason: closure.reason || null,
-      isRecurring: closure.isRecurring || false,
-      recurrenceFrequency: closure.recurrenceFrequency || null,
-    },
-  });
-
-  return NextResponse.json({ id: created.id });
 }
 
 export async function DELETE(request: NextRequest) {
