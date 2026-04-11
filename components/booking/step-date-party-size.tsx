@@ -49,10 +49,6 @@ export function StepDatePartySize({ data, updateData, onNext }: Props) {
   }
 
   function handleNext() {
-    if (!data.date) {
-      toast.error("Please select a date");
-      return;
-    }
     if (data.partySize < 1) {
       toast.error("Party size must be at least 1");
       return;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { format } from "date-fns";
 import { Header } from "@/components/shared/header";
 import { Footer } from "@/components/shared/footer";
 import { StepDatePartySize } from "@/components/booking/step-date-party-size";
@@ -21,8 +22,17 @@ export type BookingData = {
   childrenCount: number;
 };
 
+function getDefaultDate(): string {
+  const today = new Date();
+  // If today is Monday (closed), default to Tuesday
+  if (today.getDay() === 1) {
+    today.setDate(today.getDate() + 1);
+  }
+  return format(today, "yyyy-MM-dd");
+}
+
 const initialData: BookingData = {
-  date: "",
+  date: getDefaultDate(),
   partySize: 2,
   time: "",
   mealPeriod: "",
