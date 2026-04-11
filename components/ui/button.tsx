@@ -56,8 +56,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         <SlotComp
           data-slot="button"
           className={cn(buttonVariants({ variant, size, className }))}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ref={ref as any}
+          ref={ref as React.Ref<HTMLElement>}
           {...props}
         />
       )

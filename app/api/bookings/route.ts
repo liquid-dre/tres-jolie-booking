@@ -99,7 +99,7 @@ async function sendConfirmationEmail(booking: {
           <div style="background: #f8f5f0; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <p style="margin: 4px 0;"><strong>Reference:</strong> ${booking.reference}</p>
             <p style="margin: 4px 0;"><strong>Date:</strong> ${formatDate(booking.date)}</p>
-            <p style="margin: 4px 0;"><strong>Time:</strong> ${formatTime(booking.time)} (${MEAL_PERIOD_LABELS[booking.mealPeriod as keyof typeof MEAL_PERIOD_LABELS] || booking.mealPeriod})</p>
+            <p style="margin: 4px 0;"><strong>Time:</strong> ${formatTime(booking.time)} (${MEAL_PERIOD_LABELS[booking.mealPeriod] || booking.mealPeriod})</p>
             <p style="margin: 4px 0;"><strong>Guests:</strong> ${booking.partySize}</p>
             ${booking.specialRequests ? `<p style="margin: 4px 0;"><strong>Special Requests:</strong> ${booking.specialRequests}</p>` : ""}
           </div>
