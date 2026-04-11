@@ -50,6 +50,10 @@ export default function SettingsPage() {
     async function load() {
       try {
         const res = await fetch("/api/admin/settings");
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || `Server error ${res.status}`);
+        }
         const data = await res.json();
         setHours(data.hours || []);
         setClosures(
@@ -58,8 +62,9 @@ export default function SettingsPage() {
             date: c.date.split("T")[0],
           }))
         );
-      } catch {
-        toast.error("Failed to load settings");
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : "Failed to load settings";
+        toast.error(msg);
       } finally {
         setLoading(false);
       }
@@ -177,10 +182,19 @@ export default function SettingsPage() {
         body: JSON.stringify({ type: "seedDefaults" }),
       });
       if (!res.ok) throw new Error();
-      // Re-fetch all hours to get complete state
-      const refetch = await fetch("/api/admin/settings");
-      const data = await refetch.json();
-      setHours(data.hours || []);
+      const seedData = await res.json();
+      // Use seeded hours from POST response directly
+      setHours(seedData.hours || []);
+      // Also re-fetch to pick up any pre-existing non-default slots
+      try {
+        const refetch = await fetch("/api/admin/settings");
+        if (refetch.ok) {
+          const data = await refetch.json();
+          if (data.hours?.length) setHours(data.hours);
+        }
+      } catch {
+        // Re-fetch failed — seeded hours are already displayed
+      }
       toast.success("Default time slots seeded successfully.");
     } catch {
       toast.error("Failed to seed default time slots");
